@@ -1,10 +1,11 @@
 package com.example.myecommerceapp.presentation.main
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.fragment.NavHostFragment
 import com.example.myecommerceapp.R
+import com.example.myecommerceapp.presentation.lifecycle.activity.LifecycleDemoActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,10 +13,13 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        val btnLifecycleDemoActivity = findViewById<Button>(R.id.btnLifeCycle)
 
-        enableEdgeToEdge()
+        btnLifecycleDemoActivity.setOnClickListener {
+            val intent = Intent(this, LifecycleDemoActivity::class.java)
+            startActivity(intent)
+        }
     }
+
 
 }
