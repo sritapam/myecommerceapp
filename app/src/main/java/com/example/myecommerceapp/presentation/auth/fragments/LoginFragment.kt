@@ -1,4 +1,4 @@
-package com.example.myecommerceapp.auth.ui
+package com.example.myecommerceapp.presentation.auth.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

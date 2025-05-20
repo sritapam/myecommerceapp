@@ -1,4 +1,4 @@
-package com.example.myecommerceapp.product.ui
+package com.example.myecommerceapp.presentation.cart.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,12 +9,12 @@ import com.example.myecommerceapp.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ProductListFragment : Fragment() {
+class CartFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_product_list, container, false)
+        return inflater.inflate(R.layout.fragment_cart, container, false)
     }
 }

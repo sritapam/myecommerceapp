@@ -1,4 +1,4 @@
-package com.example.myecommerceapp.profile.ui
+package com.example.myecommerceapp.presentation.order.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,9 +6,9 @@ import com.example.myecommerceapp.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ProfileActivity: AppCompatActivity() {
+class OrderHistoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile)
+        setContentView(R.layout.activity_order_history)
     }
 }
