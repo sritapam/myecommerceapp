@@ -1,8 +1,8 @@
 [versions]
-agp = "8.9.2"
+agp = "8.9.3"
 constraintlayoutCompose = "1.1.1"
 converterGson = "2.9.0"
-fragmentKtx = "1.8.6"
+fragmentKtx = "1.8.7"
 hiltAndroid = "2.51"
 hiltCompiler = "2.51"
 kotlin = "2.0.21"
@@ -12,8 +12,10 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2024.09.00"
+composeBom = "2025.05.01"
 navigationCompose = "2.9.0"
+recyclerview = "1.4.0"
+recyclerviewSelection = "1.2.0"
 retrofit = "2.9.0"
 navigationFragment = "2.9.0"
 appcompat = "1.7.0"
@@ -26,6 +28,8 @@ androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constr
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+androidx-recyclerview-selection = { module = "androidx.recyclerview:recyclerview-selection", version.ref = "recyclerviewSelection" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroid" }
