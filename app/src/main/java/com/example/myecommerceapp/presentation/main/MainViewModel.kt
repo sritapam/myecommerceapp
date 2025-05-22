@@ -1,7 +1,7 @@
 package com.example.myecommerceapp.presentation.main
 
 import androidx.lifecycle.ViewModel
-import com.example.myecommerceapp.domain.AuthRepository
+import com.example.myecommerceapp.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject

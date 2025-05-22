@@ -1,12 +1,12 @@
-package com.example.myecommerceapp.data
+package com.example.myecommerceapp.data.repository
 
-import com.example.myecommerceapp.domain.Product
-import com.example.myecommerceapp.domain.ProductRepository
+import com.example.myecommerceapp.domain.model.Product
+import com.example.myecommerceapp.domain.repository.ProductRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FakeProductRepository @Inject constructor() : ProductRepository {
+class FakeProductRepositoryImpl @Inject constructor() : ProductRepository {
     override suspend fun getProducts(): List<Product> {
         return listOf(
             Product(1, "Café", 3.50),

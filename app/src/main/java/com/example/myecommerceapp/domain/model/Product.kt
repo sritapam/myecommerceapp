@@ -1,4 +1,4 @@
-package com.example.myecommerceapp.domain
+package com.example.myecommerceapp.domain.model
 
 data class Product(
     val id: Int,

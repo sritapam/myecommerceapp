@@ -1,9 +1,9 @@
 package com.example.myecommerceapp.di
 
-import com.example.myecommerceapp.data.AuthRepositoryImpl
-import com.example.myecommerceapp.data.FakeProductRepository
-import com.example.myecommerceapp.domain.AuthRepository
-import com.example.myecommerceapp.domain.ProductRepository
+import com.example.myecommerceapp.data.repository.AuthRepositoryImpl
+import com.example.myecommerceapp.data.repository.FakeProductRepositoryImpl
+import com.example.myecommerceapp.domain.repository.AuthRepository
+import com.example.myecommerceapp.domain.repository.ProductRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -23,6 +23,6 @@ abstract class AppModule {
     @Binds
     @Singleton // Asegura que solo haya una instancia de ProductRepository durante la vida de la app
     abstract fun bindProductRepository(
-        fakeProductRepository: FakeProductRepository
+        fakeProductRepository: FakeProductRepositoryImpl
     ): ProductRepository
 }

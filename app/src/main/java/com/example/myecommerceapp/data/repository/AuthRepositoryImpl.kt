@@ -1,15 +1,15 @@
-package com.example.myecommerceapp.data
+package com.example.myecommerceapp.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.myecommerceapp.domain.AuthRepository
+import com.example.myecommerceapp.domain.repository.AuthRepository
 import com.example.myecommerceapp.presentation.auth.AuthConstants
-import javax.inject.Inject
-import javax.inject.Singleton
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
 private val PREFS_FILE_NAME = "MyEcommerceAppPrefs"
 private val KEY_IS_LOGGED_IN = "isLoggedIn"
@@ -24,7 +24,8 @@ class AuthRepositoryImpl
         context.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE)
     }
 
-    private val _isLoggedIn = MutableStateFlow(sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false))
+    private val _isLoggedIn =
+        MutableStateFlow(sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false))
     override fun isLoggedIn(): StateFlow<Boolean> = _isLoggedIn
 
     override fun setLoggedIn(loggedIn: Boolean) {
@@ -73,7 +74,3 @@ class AuthRepositoryImpl
     }
 
 }
-
-
-
-

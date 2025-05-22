@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.myecommerceapp.R
 import com.example.myecommerceapp.databinding.FragmentProductListBinding
-import com.example.myecommerceapp.domain.AuthRepository
+import com.example.myecommerceapp.domain.repository.AuthRepository
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
