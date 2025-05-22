@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Base.Theme.MyEcommerceApp" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Base.Theme.MyEcommerceApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
     </style>
 
     <style name="Theme.MyEcommerceApp" parent="Base.Theme.MyEcommerceApp" />

@@ -3,7 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/productListFragment">
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.myecommerceapp.presentation.auth.fragments.login.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_productListFragment"
+            app:destination="@id/productListFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" /> 
+    </fragment>
+
 
     <fragment
         android:id="@+id/productListFragment"
@@ -17,11 +30,6 @@
         android:label="fragment_cart"
         tools:layout="@layout/fragment_cart" />
 
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.myecommerceapp.presentation.auth.fragments.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
 
     <fragment
         android:id="@+id/registerBottomSheetFragment"
