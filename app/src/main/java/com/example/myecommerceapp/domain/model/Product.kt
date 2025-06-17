@@ -1,7 +1,10 @@
 package com.example.myecommerceapp.domain.model
 
 data class Product(
-    val id: Int,
+    val id: String,
     val name: String,
-    val price: Double
+    val description: String,
+    val price: Double,
+    val includesDrink: Boolean,
+    val imageUrl: String? = null
 )

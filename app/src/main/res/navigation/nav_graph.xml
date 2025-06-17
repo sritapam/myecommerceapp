@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.myecommerceapp.presentation.auth.fragments.login.LoginFragment"
+        android:name="com.example.myecommerceapp.view.ui.auth.fragments.login.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
         <action
@@ -20,38 +20,38 @@
 
     <fragment
         android:id="@+id/productListFragment"
-        android:name="com.example.myecommerceapp.presentation.product.fragments.ProductListFragment"
+        android:name="com.example.myecommerceapp.view.ui.product.fragments.ProductListFragment"
         android:label="fragment_product_list"
         tools:layout="@layout/fragment_product_list" />
 
     <fragment
         android:id="@+id/cartFragment"
-        android:name="com.example.myecommerceapp.presentation.cart.fragments.CartFragment"
+        android:name="com.example.myecommerceapp.view.ui.cart.fragments.CartFragment"
         android:label="fragment_cart"
         tools:layout="@layout/fragment_cart" />
 
 
     <fragment
         android:id="@+id/registerBottomSheetFragment"
-        android:name="com.example.myecommerceapp.presentation.auth.fragments.bottomsheet.RegisterBottomSheetFragment"
+        android:name="com.example.myecommerceapp.view.ui.auth.fragments.bottomsheet.RegisterBottomSheetFragment"
         android:label="fragment_register_bottom_sheet"
         tools:layout="@layout/fragment_register_bottom_sheet" />
 
     <activity
         android:id="@+id/orderHistoryActivity"
-        android:name="com.example.myecommerceapp.presentation.order.activity.OrderHistoryActivity"
+        android:name="com.example.myecommerceapp.view.ui.order.activity.OrderHistoryActivity"
         android:label="activity_order_history"
         tools:layout="@layout/activity_order_history" />
 
     <activity
         android:id="@+id/productDetailActivity"
-        android:name="com.example.myecommerceapp.presentation.product.activity.ProductDetailActivity"
+        android:name="com.example.myecommerceapp.view.ui.product.activity.ProductDetailActivity"
         android:label="activity_product_detail"
         tools:layout="@layout/activity_product_detail" />
 
     <activity
         android:id="@+id/profileActivity"
-        android:name="com.example.myecommerceapp.presentation.profile.activity.ProfileActivity"
+        android:name="com.example.myecommerceapp.view.ui.profile.activity.ProfileActivity"
         android:label="activity_profile"
         tools:layout="@layout/activity_profile" />
 

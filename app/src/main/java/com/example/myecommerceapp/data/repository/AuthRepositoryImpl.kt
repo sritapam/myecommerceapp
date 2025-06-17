@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.example.myecommerceapp.domain.repository.AuthRepository
-import com.example.myecommerceapp.presentation.auth.AuthConstants
+import com.example.myecommerceapp.view.ui.auth.AuthConstants
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +17,7 @@ private val KEY_IS_LOGGED_IN = "isLoggedIn"
 @Singleton
 class AuthRepositoryImpl
 @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : AuthRepository {
 
     private val sharedPreferences: SharedPreferences by lazy {
