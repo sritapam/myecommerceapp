@@ -1,17 +1,16 @@
 package com.example.myecommerceapp.di
 
-import com.example.myecommerceapp.data.repository.AuthRepositoryImpl
-import com.example.myecommerceapp.data.repository.FakeProductRepositoryImpl
-import com.example.myecommerceapp.domain.repository.AuthRepository
-import com.example.myecommerceapp.domain.repository.ProductRepository
+import com.henrypeya.core.model.AuthRepository
+import com.henrypeya.core.model.ProductRepository
+import com.henrypeya.data.AuthRepositoryImpl
+import com.henrypeya.data.FakeProductRepositoryImpl
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Module
+@Module //gestiona objetos o dependencias que Hilt puede inyectar
 @InstallIn(SingletonComponent::class)
 abstract class AppModule {
     // Hilt: "Cuando alguien pida AuthRepository, dale una instancia de AuthRepositoryImpl"

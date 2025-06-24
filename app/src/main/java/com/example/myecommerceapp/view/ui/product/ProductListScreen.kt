@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myecommerceapp.domain.model.Product
 import com.example.myecommerceapp.ui.theme.MyEcommerceAppTheme
 import com.example.myecommerceapp.view.viewmodel.product.ProductListViewModel
 
@@ -112,7 +110,7 @@ fun ProductListScreen(
 }
 
 @Composable
-fun ProductItem(product: Product, onAddToCartClick: (Product) -> Unit) {
+fun ProductItem(product: com.henrypeya.core.model.Product, onAddToCartClick: (com.henrypeya.core.model.Product) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,7 +176,7 @@ fun ProductListScreenPreview() {
 fun ProductItemPreview() {
     MyEcommerceAppTheme {
         ProductItem(
-            product = Product(
+            product = com.henrypeya.core.model.Product(
                 "P001",
                 "Café Espresso",
                 "Un café intenso y aromático para empezar el día.",

@@ -2,8 +2,8 @@ package com.example.myecommerceapp.view.viewmodel.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myecommerceapp.domain.model.Product
-import com.example.myecommerceapp.domain.usecase.GetProductsUseCase
+import com.henrypeya.core.model.GetProductsUseCase
+import com.henrypeya.core.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,14 +24,14 @@ data class ProductListUiState(
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
-    private val getProductsUseCase: GetProductsUseCase
+    private val getProductsUseCase: GetProductsUseCase//INYECTAR LA INTERFAZ DEL USE CASE
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductListUiState())
     val uiState: StateFlow<ProductListUiState> =
         _uiState.asStateFlow() //la UI solo puede leerlo y no modificar
 
-    private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
+    private val _allProducts = MutableStateFlow<List<com.henrypeya.core.model.Product>>(emptyList())
 
     init {
         loadProducts()
@@ -72,7 +72,7 @@ class ProductListViewModel @Inject constructor(
         _uiState.update { it.copy(searchQuery = newQuery) }
     }
 
-    fun addProductToCart(product: Product) {
+    fun addProductToCart(product: com.henrypeya.core.model.Product) {
         // TODO: Lógica para agregar al carrito (ej. Actualizar un Flow de CartItems)
         // Por ahora, solo un log o Toast
         _uiState.update { it.copy(errorMessage = "Producto '${product.name}' añadido al carrito (simulado).") }

@@ -8,10 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import com.example.myecommerceapp.R
-import com.example.myecommerceapp.databinding.FragmentProductListBinding
-import com.example.myecommerceapp.domain.repository.AuthRepository
+import com.henrypeya.core.model.AuthRepository
 import com.example.myecommerceapp.ui.theme.MyEcommerceAppTheme
 import com.example.myecommerceapp.view.ui.product.ProductListScreen
 import dagger.hilt.android.AndroidEntryPoint

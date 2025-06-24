@@ -2,7 +2,7 @@ package com.example.myecommerceapp.view.ui.auth.fragments.bottomsheet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myecommerceapp.domain.repository.AuthRepository
+import com.henrypeya.core.model.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

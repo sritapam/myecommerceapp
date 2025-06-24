@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.myecommerceapp.R
 import com.example.myecommerceapp.databinding.ActivityMainBinding
-import com.example.myecommerceapp.domain.repository.AuthRepository
+import com.henrypeya.core.model.AuthRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

@@ -28,3 +28,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "MyEcommerceApp"
 include(":app")
+include(":core:model")
+include(":data")
+include(":library:utils")
+include(":feature-cart")
