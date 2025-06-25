@@ -46,7 +46,7 @@ com.example.myecommerceapp/  ├── data/ # (Suposición) Modelos de datos, f
 
 Para entender en profundidad las decisiones técnicas y las tecnologías que dan vida a esta aplicación, hemos preparado un informe técnico detallado. Este documento explica por qué elegimos cada herramienta y cómo encaja en nuestra arquitectura Clean (Data, Domain, Presentation).
 
-[**Ver Informe Técnico: Tecnologías y Arquitectura**](./docs/tecnologias.md)
+[**Ver Informe Técnico: Tecnologías y Arquitectura**](./docs/tencnologias.md)
 
 ---
 
