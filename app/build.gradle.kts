@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(project(":feature-cart"))
     implementation(project(":feature-auth"))
+    implementation(project(":feature-product-list"))
     implementation(project(":core:model"))
     implementation(project(":core:ui"))
     implementation(project(":data"))

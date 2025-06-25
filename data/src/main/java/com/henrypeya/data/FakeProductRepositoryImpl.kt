@@ -8,7 +8,7 @@ import javax.inject.Singleton
 @Singleton
 class FakeProductRepositoryImpl @Inject constructor() : ProductRepository {
     override suspend fun getProducts(): List<com.henrypeya.core.model.Product> {
-        delay(500) // Simular retardo de red
+        delay(500) 
         return listOf(
             com.henrypeya.core.model.Product(
                 "P001",

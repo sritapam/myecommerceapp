@@ -28,6 +28,8 @@ import com.henrypeya.core.ui.MyEcommerceAppTheme
 import com.henrypeya.feature_auth.ui.AuthViewModel
 import com.henrypeya.feature_auth.ui.LoginScreen
 import com.henrypeya.feature_auth.ui.RegisterScreen
+import com.henrypeya.feature_cart.CartScreen
+import com.henrypeya.feature_product_list.ProductListScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 
@@ -122,20 +124,11 @@ fun AppNavHost() {
         }
 
         composable("product_list_route") {
-            //TODO Placeholder para la pantalla de Listado de Productos
-
-            Text(
-                "Product List Screen Placeholder (to be moved to feature-product-list)",
-                modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
-            )
+            ProductListScreen(navController = navController)
         }
 
-        // TODO: Añadir la ruta para el carrito (feature-cart) más adelante
         composable("cart_route") {
-            Text(
-                "Cart Screen Placeholder (to be implemented in feature-cart)",
-                modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
-            )
+            CartScreen(navController = navController)
         }
     }
 }

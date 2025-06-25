@@ -1,8 +1,10 @@
 package com.example.myecommerceapp.di
 
 import com.henrypeya.core.model.AuthRepository
+import com.henrypeya.core.model.CartRepository
 import com.henrypeya.core.model.ProductRepository
 import com.henrypeya.data.AuthRepositoryImpl
+import com.henrypeya.data.FakeCartRepositoryImpl
 import com.henrypeya.data.FakeProductRepositoryImpl
 import dagger.Binds
 import dagger.Module
@@ -15,14 +17,20 @@ import javax.inject.Singleton
 abstract class AppModule {
     // Hilt: "Cuando alguien pida AuthRepository, dale una instancia de AuthRepositoryImpl"
     @Binds
-    @Singleton // Asegura que solo haya una instancia de AuthRepository durante la vida de la app
+    @Singleton
     abstract fun bindAuthRepository(
         authRepositoryImpl: AuthRepositoryImpl
     ): AuthRepository
 
     @Binds
-    @Singleton // Asegura que solo haya una instancia de ProductRepository durante la vida de la app
+    @Singleton
     abstract fun bindProductRepository(
         fakeProductRepository: FakeProductRepositoryImpl
     ): ProductRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCartRepository(
+        fakeCartRepositoryImpl: FakeCartRepositoryImpl
+    ): CartRepository
 }
