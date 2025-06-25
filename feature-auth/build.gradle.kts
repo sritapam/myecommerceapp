@@ -8,13 +8,14 @@ plugins {
 }
 
 android {
-    namespace = "com.henrypeya.feature_cart"
+    namespace = "com.henrypeya.feature_auth"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 27
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -67,6 +68,8 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":library:utils"))
     implementation(project(":core:ui"))
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

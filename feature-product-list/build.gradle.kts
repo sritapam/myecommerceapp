@@ -8,13 +8,14 @@ plugins {
 }
 
 android {
-    namespace = "com.henrypeya.feature_cart"
+    namespace = "com.henrypeya.feature_product_list"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 27
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -65,8 +66,8 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(project(":data"))
     implementation(project(":core:model"))
-    implementation(project(":library:utils"))
     implementation(project(":core:ui"))
+    implementation(project(":library:utils"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

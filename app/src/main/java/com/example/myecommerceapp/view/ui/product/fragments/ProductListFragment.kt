@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import com.henrypeya.core.model.AuthRepository
-import com.example.myecommerceapp.ui.theme.MyEcommerceAppTheme
+import com.henrypeya.core.ui.MyEcommerceAppTheme
 import com.example.myecommerceapp.view.ui.product.ProductListScreen
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class ProductListFragment : Fragment() {
         // Retorna un ComposeView que aloja tu Composable ProductListScreen
         return ComposeView(requireContext()).apply {
             setContent {
-                MyEcommerceAppTheme {
+                com.henrypeya.core.ui.MyEcommerceAppTheme {
                     ProductListScreen()
                 }
             }

@@ -35,8 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myecommerceapp.ui.theme.MyEcommerceAppTheme
+import com.henrypeya.core.ui.MyEcommerceAppTheme
 import com.example.myecommerceapp.view.viewmodel.product.ProductListViewModel
+import com.henrypeya.core.model.Product
 
 @Composable
 fun ProductListScreen(
@@ -166,7 +167,7 @@ fun ProductItem(product: com.henrypeya.core.model.Product, onAddToCartClick: (co
 @Preview(showBackground = true)
 @Composable
 fun ProductListScreenPreview() {
-    MyEcommerceAppTheme {
+    com.henrypeya.core.ui.MyEcommerceAppTheme {
         ProductListScreen()
     }
 }
@@ -174,9 +175,9 @@ fun ProductListScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 fun ProductItemPreview() {
-    MyEcommerceAppTheme {
+    com.henrypeya.core.ui.MyEcommerceAppTheme {
         ProductItem(
-            product = com.henrypeya.core.model.Product(
+            product = Product(
                 "P001",
                 "Café Espresso",
                 "Un café intenso y aromático para empezar el día.",
