@@ -1,7 +1,7 @@
 package com.henrypeya.core.model.domain.usecase.cart
 
-import com.henrypeya.core.model.CartRepository
-import com.henrypeya.core.model.Product
+import com.henrypeya.core.model.domain.repository.cart.CartRepository
+import com.henrypeya.core.model.domain.model.product.Product
 import javax.inject.Inject
 
 /**
@@ -12,7 +12,6 @@ class AddToCartUseCase @Inject constructor(
     private val cartRepository: CartRepository
 ) {
     suspend operator fun invoke(product: Product) {
-        // Lógica real: llama al método addProduct del repositorio del carrito
         cartRepository.addProduct(product)
     }
 }

@@ -3,7 +3,8 @@ package com.henrypeya.feature_auth.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.henrypeya.core.model.AuthRepository
+import com.henrypeya.core.model.domain.repository.auth.AuthRepository
+import com.henrypeya.feature_auth.ui.state.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,26 +14,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-/**
- * Represents the different states of the login process.
- */
-sealed class LoginState {
-    /** The initial or idle state, waiting for user input. */
-    object Idle : LoginState()
-
-    /** Indicates that the login process is ongoing. */
-    object Loading : LoginState()
-
-    /** Indicates a successful login. */
-    object Success : LoginState()
-
-    /**
-     * Represents an error state with a message describing the error.
-     * @param message The error message to display.
-     */
-    data class Error(val message: String) : LoginState()
-}
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
@@ -49,7 +30,6 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     private val _passwordError = MutableStateFlow<String?>(null)
     val passwordError: StateFlow<String?> = _passwordError.asStateFlow()
 
-    //Estado general del login
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
@@ -115,6 +95,7 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         }
 
         _loginState.value = LoginState.Loading
+
         viewModelScope.launch {
             try {
                 val loginSuccess = authRepository.login(email.value, password.value)

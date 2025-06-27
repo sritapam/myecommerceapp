@@ -1,7 +1,7 @@
 package com.henrypeya.core.model.domain.usecase.cart
 
-import com.henrypeya.core.model.CartItem
-import com.henrypeya.core.model.CartRepository
+import com.henrypeya.core.model.domain.model.cart.CartItem
+import com.henrypeya.core.model.domain.repository.cart.CartRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

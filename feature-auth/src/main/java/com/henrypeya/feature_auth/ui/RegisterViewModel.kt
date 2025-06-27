@@ -3,7 +3,8 @@ package com.henrypeya.feature_auth.ui
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.henrypeya.core.model.AuthRepository
+import com.henrypeya.core.model.domain.repository.auth.AuthRepository
+import com.henrypeya.feature_auth.ui.state.RegisterState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,13 +14,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed class RegisterState {
-    object Idle : RegisterState()
-    object Loading : RegisterState()
-    object Success : RegisterState()
-    data class Error(val message: String) : RegisterState()
-}
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {

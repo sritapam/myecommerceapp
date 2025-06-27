@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import kotlinx.coroutines.launch
 import com.henrypeya.core.ui.MyEcommerceAppTheme
+import com.henrypeya.feature_auth.ui.state.RegisterState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

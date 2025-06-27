@@ -2,7 +2,7 @@ package com.henrypeya.feature_auth.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.henrypeya.core.model.AuthRepository
+import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +26,6 @@ class AuthViewModel @Inject constructor(
 
     fun logout() {
         authRepository.logout()
-        // Lógica adicional de limpieza si la necesito
+        // Lógica adicional de limpieza al necesitarlo
     }
 }

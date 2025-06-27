@@ -46,6 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import androidx.compose.material3.CircularProgressIndicator
 import com.henrypeya.core.ui.MyEcommerceAppTheme
+import com.henrypeya.feature_auth.ui.state.LoginState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,19 +61,15 @@ fun LoginScreen(
     val passwordError by viewModel.passwordError.collectAsStateWithLifecycle()
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
 
-    var passwordVisible by rememberSaveable { mutableStateOf(false) } // Para visibilidad de contraseña (soporta rotación)
+    var passwordVisible by rememberSaveable { mutableStateOf(false) } // (soporta rotación)
 
-    // ScaffoldState y SnackbarHostState para mostrar mensajes generales
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope() // Necesario para lanzar coroutine para snackbar
+    val scope = rememberCoroutineScope()
 
-    // Reaccionar a cambios de estado de login (éxito/error general)
     LaunchedEffect(loginState) {
         when (loginState) {
             LoginState.Success -> {
-                // Navegar a la pantalla principal de productos
                 navController.navigate("product_list_route") {
-                    // Limpiar el back stack para que el usuario no pueda volver al login
                     popUpTo("login_route") { inclusive = true }
                 }
             }
@@ -84,7 +81,7 @@ fun LoginScreen(
                         withDismissAction = true
                     )
                 }
-                viewModel.errorShown() // Notificar al ViewModel que el error fue manejado
+                viewModel.errorShown()
             }
             else -> { /* Idle or Loading, do nothing specific here */ }
         }

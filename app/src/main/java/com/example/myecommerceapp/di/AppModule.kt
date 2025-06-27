@@ -1,8 +1,8 @@
 package com.example.myecommerceapp.di
 
-import com.henrypeya.core.model.AuthRepository
-import com.henrypeya.core.model.CartRepository
-import com.henrypeya.core.model.ProductRepository
+import com.henrypeya.core.model.domain.repository.auth.AuthRepository
+import com.henrypeya.core.model.domain.repository.cart.CartRepository
+import com.henrypeya.core.model.domain.repository.product.ProductRepository
 import com.henrypeya.data.AuthRepositoryImpl
 import com.henrypeya.data.FakeCartRepositoryImpl
 import com.henrypeya.data.FakeProductRepositoryImpl
@@ -12,10 +12,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Module //gestiona objetos o dependencias que Hilt puede inyectar
+@Module
 @InstallIn(SingletonComponent::class)
 abstract class AppModule {
-    // Hilt: "Cuando alguien pida AuthRepository, dale una instancia de AuthRepositoryImpl"
     @Binds
     @Singleton
     abstract fun bindAuthRepository(

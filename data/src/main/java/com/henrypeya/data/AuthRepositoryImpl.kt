@@ -1,6 +1,6 @@
 package com.henrypeya.data
 
-import com.henrypeya.core.model.AuthRepository
+import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

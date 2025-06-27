@@ -1,8 +1,8 @@
 package com.henrypeya.data
 
-import com.henrypeya.core.model.CartItem
-import com.henrypeya.core.model.CartRepository
-import com.henrypeya.core.model.Product
+import com.henrypeya.core.model.domain.model.cart.CartItem
+import com.henrypeya.core.model.domain.repository.cart.CartRepository
+import com.henrypeya.core.model.domain.model.product.Product
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

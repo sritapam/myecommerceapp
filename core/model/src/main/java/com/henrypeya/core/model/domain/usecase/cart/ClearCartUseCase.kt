@@ -1,6 +1,6 @@
 package com.henrypeya.core.model.domain.usecase.cart
 
-import com.henrypeya.core.model.CartRepository
+import com.henrypeya.core.model.domain.repository.cart.CartRepository
 import javax.inject.Inject
 
 /**
