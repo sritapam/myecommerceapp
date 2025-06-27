@@ -69,7 +69,7 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         when (loginState) {
             LoginState.Success -> {
-                navController.navigate("product_list_route") {
+                navController.navigate("main_app_graph") {
                     popUpTo("login_route") { inclusive = true }
                 }
             }

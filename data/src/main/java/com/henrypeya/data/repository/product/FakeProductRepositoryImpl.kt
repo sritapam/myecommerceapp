@@ -1,4 +1,4 @@
-package com.henrypeya.data
+package com.henrypeya.data.repository.product
 
 import com.henrypeya.core.model.domain.model.product.Product
 import com.henrypeya.core.model.domain.repository.product.ProductRepository

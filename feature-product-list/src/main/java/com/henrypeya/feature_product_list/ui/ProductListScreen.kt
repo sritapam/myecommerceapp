@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -101,7 +103,12 @@ fun ProductListScreen(
                 value = uiState.searchQuery,
                 onValueChange = viewModel::onSearchQueryChange,
                 label = { Text("Buscar producto...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Icono de Búsqueda") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Icono de Búsqueda"
+                    )
+                },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -205,7 +212,11 @@ fun ProductItem(product: Product, onAddToCartClick: (Product) -> Unit) {
                 )
                 if (product.includesDrink) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Incluye bebida")
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = "Incluye bebida",
+                            modifier = Modifier.size(10.dp)
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(text = "Incl. Bebida", style = MaterialTheme.typography.labelSmall)
                     }

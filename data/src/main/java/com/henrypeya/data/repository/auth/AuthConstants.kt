@@ -1,4 +1,4 @@
-package com.henrypeya.data
+package com.henrypeya.data.repository.auth
 
 object AuthConstants {
     const val TEST_EMAIL = "test@test.com"

@@ -1,4 +1,4 @@
-package com.henrypeya.data
+package com.henrypeya.data.repository.auth
 
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import kotlinx.coroutines.InternalCoroutinesApi

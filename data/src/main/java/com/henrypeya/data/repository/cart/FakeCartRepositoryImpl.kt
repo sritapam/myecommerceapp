@@ -1,4 +1,4 @@
-package com.henrypeya.data
+package com.henrypeya.data.repository.cart
 
 import com.henrypeya.core.model.domain.model.cart.CartItem
 import com.henrypeya.core.model.domain.repository.cart.CartRepository
