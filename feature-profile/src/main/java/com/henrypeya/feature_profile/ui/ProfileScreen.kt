@@ -1,9 +1,11 @@
 package com.henrypeya.feature_profile.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -22,23 +24,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
 import androidx.core.content.ContextCompat
-import com.henrypeya.core.model.domain.model.user.User
-import com.henrypeya.core.model.domain.repository.user.UserRepository
-import com.henrypeya.core.ui.MyEcommerceAppTheme
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,7 +81,16 @@ fun ProfileScreen(
         if (isGranted) {
             cameraLauncher.launch(null)
         } else {
-            scope.launch { snackbarHostState.showSnackbar("Permiso de cámara denegado. No se puede tomar la foto.") }
+            if (!shouldShowRequestPermissionRationale(context, Manifest.permission.CAMERA)) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        "Permiso de cámara denegado permanentemente. Habilítalo en Ajustes de la aplicación.",
+                        withDismissAction = true
+                    )
+                }
+            } else {
+                scope.launch { snackbarHostState.showSnackbar("Permiso de cámara denegado.") }
+            }
         }
     }
 
@@ -99,7 +100,23 @@ fun ProfileScreen(
         if (isGranted) {
             galleryLauncher.launch("image/*")
         } else {
-            scope.launch { snackbarHostState.showSnackbar("Permiso de galería denegado. No se puede seleccionar la imagen.") }
+            val permissionToRequest =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    Manifest.permission.READ_MEDIA_IMAGES
+                } else {
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                }
+
+            if (!shouldShowRequestPermissionRationale(context, permissionToRequest)) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        "Permiso de galería denegado permanentemente. Habilítalo en Ajustes de la aplicación.",
+                        withDismissAction = true
+                    )
+                }
+            } else {
+                scope.launch { snackbarHostState.showSnackbar("Permiso de galería denegado. No se puede seleccionar la imagen.") }
+            }
         }
     }
 
@@ -128,6 +145,7 @@ fun ProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Círculo de la imagen de perfil
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -135,19 +153,20 @@ fun ProfileScreen(
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
+                Log.d("ProfileScreen", "Current imageUrl in UI: ${uiState.user.imageUrl}")
                 if (!uiState.user.imageUrl.isNullOrEmpty()) {
                     SubcomposeAsyncImage(
                         model = uiState.user.imageUrl,
                         contentDescription = "Profile Picture",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop, // Importante para ajuste
+                        contentScale = ContentScale.Crop,
                         loading = { CircularProgressIndicator() },
                         error = {
-
+                            Log.e("ProfileScreen", "Error loading image: ${uiState.user.imageUrl}")
                             Image(
                                 imageVector = Icons.Filled.CameraAlt,
                                 contentDescription = "Error al cargar imagen",
-                                colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Gray), // ¡COLOR CAMBIADO a gris!
+                                colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Gray),
                                 modifier = Modifier.size(60.dp)
                             )
                         }
@@ -156,7 +175,7 @@ fun ProfileScreen(
                     Image(
                         imageVector = Icons.Filled.CameraAlt,
                         contentDescription = "Add Profile Picture",
-                        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer), // Usa un color del tema
+                        colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
                         modifier = Modifier.size(60.dp)
                     )
                 }
@@ -167,24 +186,26 @@ fun ProfileScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botones para cambiar la foto (solo si está editando)
             if (uiState.isEditing) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = {
-                        // Flujo de permisos para Cámara
+                        val cameraPermission = Manifest.permission.CAMERA
                         when {
                             ContextCompat.checkSelfPermission(
                                 context,
-                                Manifest.permission.CAMERA
+                                cameraPermission
                             ) == PackageManager.PERMISSION_GRANTED -> {
                                 cameraLauncher.launch(null)
                             }
 
-                            else -> {
+                            shouldShowRequestPermissionRationale(context, cameraPermission) -> {
                                 showCameraPermissionDialog = true
+                            }
+                            else -> {
+                                requestCameraPermissionLauncher.launch(cameraPermission)
                             }
                         }
                     }) {
@@ -193,16 +214,26 @@ fun ProfileScreen(
                         Text("Cámara")
                     }
                     Button(onClick = {
+                        val storagePermission =
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                                Manifest.permission.READ_MEDIA_IMAGES
+                            } else {
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                            }
+
                         when {
                             ContextCompat.checkSelfPermission(
                                 context,
-                                Manifest.permission.READ_EXTERNAL_STORAGE
+                                storagePermission
                             ) == PackageManager.PERMISSION_GRANTED -> {
                                 galleryLauncher.launch("image/*")
                             }
 
-                            else -> {
+                            shouldShowRequestPermissionRationale(context, storagePermission) -> {
                                 showGalleryPermissionDialog = true
+                            }
+                            else -> {
+                                requestGalleryPermissionLauncher.launch(storagePermission)
                             }
                         }
                     }) {
@@ -245,13 +276,12 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Botones (Editar/Guardar/Cancelar/Historial)
+            // Botones de acción (Editar/Guardar/Cancelar/Historial)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 if (uiState.isEditing) {
-                    // Botón Cancelar Edición
                     OutlinedButton(
                         onClick = viewModel::toggleEditMode,
                         enabled = !uiState.isLoading,
@@ -260,7 +290,6 @@ fun ProfileScreen(
                         Text("Cancelar Edición")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    // Botón Guardar Cambios
                     Button(
                         onClick = viewModel::saveProfile,
                         enabled = !uiState.isLoading,
@@ -276,7 +305,6 @@ fun ProfileScreen(
                         }
                     }
                 } else {
-                    // Botón Editar Perfil
                     Button(
                         onClick = viewModel::toggleEditMode,
                         modifier = Modifier.weight(1f)
@@ -287,7 +315,15 @@ fun ProfileScreen(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
-                        onClick = { navController.navigate("order_history_route") },
+                        onClick = {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "La funcionalidad de Historial de Pedidos aún no está implementada.",
+                                    withDismissAction = true
+                                )
+                            }
+                            //TODO navController.navigate("order_history_route")
+                        },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Historial de Pedidos")
@@ -303,6 +339,7 @@ fun ProfileScreen(
         }
     }
 
+    // Diálogos de solicitud de permisos
     if (showCameraPermissionDialog) {
         PermissionDialog(
             onDismissRequest = { showCameraPermissionDialog = false },
@@ -320,12 +357,23 @@ fun ProfileScreen(
             onDismissRequest = { showGalleryPermissionDialog = false },
             onConfirm = {
                 showGalleryPermissionDialog = false
-                requestGalleryPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                val permissionToRequest =
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        Manifest.permission.READ_MEDIA_IMAGES
+                    } else {
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    }
+                requestGalleryPermissionLauncher.launch(permissionToRequest)
             },
             permissionName = "Galería",
             rationale = "Necesitamos acceso a tu galería para que puedas seleccionar una foto de perfil."
         )
     }
+}
+
+private fun shouldShowRequestPermissionRationale(context: Context, permission: String): Boolean {
+    val activity = context as? androidx.activity.ComponentActivity
+    return activity?.shouldShowRequestPermissionRationale(permission) ?: false
 }
 
 @Composable
@@ -347,7 +395,7 @@ fun ProfileTextField(
 
 @Composable
 fun PermissionDialog(
-    onDismissRequest: () -> Unit = { },
+    onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
     permissionName: String,
     rationale: String
@@ -367,55 +415,4 @@ fun PermissionDialog(
             }
         }
     )
-}
-
-//MockUserRepository para Previews
-private class MockUserRepository : UserRepository {
-    private val _mockUser = MutableStateFlow(
-        User(
-            id = "previewUser",
-            name = "Nombre Preview",
-            surname = "Apellido Preview",
-            email = "preview@example.com",
-            nationality = "Previewland",
-            imageUrl = "https://placehold.co/200x200/4CAF50/FFFFFF?text=PR" // Color verde para el preview
-        )
-    )
-
-    override suspend fun getUserProfile(): StateFlow<User> {
-        delay(100)
-        return _mockUser.asStateFlow()
-    }
-
-    override suspend fun updateUserProfile(user: User): StateFlow<User> {
-        delay(100)
-        _mockUser.update { user }
-        return _mockUser.asStateFlow()
-    }
-
-    override suspend fun uploadProfileImage(imageData: Any): String {
-        delay(100)
-        val newUrl = when (imageData) {
-            is Bitmap -> "https://placehold.co/200x200/2196F3/FFFFFF?text=Bitmap" // Azul
-            is Uri -> "https://placehold.co/200x200/FFC107/000000?text=Uri" // Naranja
-            else -> "https://placehold.co/200x200/9E9E9E/FFFFFF?text=Error" // Gris
-        }
-        _mockUser.update { it.copy(imageUrl = newUrl) }
-        return newUrl
-    }
-}
-
-// Mock ViewModel para Previews
-class TestProfileViewModel : ProfileViewModel(
-    userRepository = MockUserRepository()
-) {}
-
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileScreenPreview() {
-    MyEcommerceAppTheme {
-        val mockViewModel = remember { TestProfileViewModel() }
-        ProfileScreen(navController = rememberNavController(), viewModel = mockViewModel)
-    }
 }

@@ -1,5 +1,6 @@
-package com.henrypeya.data.service.imageupload
+package com.henrypeya.data
 
+import com.henrypeya.data.service.imageupload.CloudinaryService
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton

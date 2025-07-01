@@ -1,5 +1,6 @@
 package com.henrypeya.feature_profile.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.model.user.User
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class ProfileViewModel @Inject constructor( //todo change
+open class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -46,6 +47,7 @@ open class ProfileViewModel @Inject constructor( //todo change
                 _editableEmail.value = user.email
                 _editableNationality.value = user.nationality
             }
+            Log.d("ProfileViewModel", "User profile loaded: ${_uiState.value.user}")
         }
     }
 
@@ -109,6 +111,14 @@ open class ProfileViewModel @Inject constructor( //todo change
             _uiState.update { it.copy(showImageUploadProgress = true, errorMessage = null) }
             try {
                 val imageUrl = userRepository.uploadProfileImage(imageData)
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        user = currentState.user.copy(imageUrl = imageUrl),
+                        showImageUploadProgress = false,
+                        errorMessage = "Imagen subida exitosamente."
+                    )
+                }
+                Log.d("ProfileViewModel", "Image upload finished. New URL set in UI state: $imageUrl")
 
                 _uiState.update {
                     it.copy(
@@ -123,6 +133,7 @@ open class ProfileViewModel @Inject constructor( //todo change
                         showImageUploadProgress = false
                     )
                 }
+                Log.e("ProfileViewModel", "Error uploading image: ${e.localizedMessage ?: "Desconocido"}")
             }
         }
     }
