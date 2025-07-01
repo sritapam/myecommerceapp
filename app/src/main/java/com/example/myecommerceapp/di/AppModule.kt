@@ -7,7 +7,7 @@ import com.henrypeya.core.model.domain.repository.user.UserRepository
 import com.henrypeya.data.repository.auth.AuthRepositoryImpl
 import com.henrypeya.data.repository.cart.FakeCartRepositoryImpl
 import com.henrypeya.data.repository.product.FakeProductRepositoryImpl
-import com.henrypeya.data.repository.user.FakeUserRepositoryImpl
+import com.henrypeya.data.repository.user.UserRepositoryImpl
 import com.henrypeya.data.service.imageupload.CloudinaryService
 import com.henrypeya.data.service.imageupload.CloudinaryServiceImpl
 import dagger.Binds
@@ -40,7 +40,7 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindUserRepository(
-        fakeUserRepositoryImpl: FakeUserRepositoryImpl
+        userRepositoryImpl: UserRepositoryImpl
     ): UserRepository
 
     @Binds

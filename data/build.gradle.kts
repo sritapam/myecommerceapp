@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    id("com.google.devtools.ksp")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
 }
@@ -41,6 +42,10 @@ dependencies {
     implementation(libs.cloudinary.android)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.room.runtime.v261)
+    implementation(libs.androidx.room.ktx.v261)
+    implementation(libs.androidx.media3.common.ktx)
+    ksp(libs.androidx.room.compiler.v261)
     implementation(project(":core:model"))
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

@@ -31,11 +31,15 @@ appcompat = "1.7.1"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
+roomCompilerVersion = "2.6.1"
+roomKtx = "2.6.1"
 roomRuntime = "2.7.2"
 playServicesAnalyticsImpl = "18.2.0"
 roomCompiler = "2.7.2"
 cloudinaryAndroidCore = "2.3.1"
 playServicesCastTv = "21.1.1"
+roomRuntimeVersion = "2.6.1"
+media3CommonKtx = "1.7.1"
 
 [libraries]
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
@@ -48,8 +52,11 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 androidx-recyclerview-selection = { module = "androidx.recyclerview:recyclerview-selection", version.ref = "recyclerviewSelection" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-compiler-v261 = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-ktx-v261 = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-room-runtime-v261 = { module = "androidx.room:room-runtime", version.ref = "roomRuntimeVersion" }
 cloudinary-android = { module = "com.cloudinary:cloudinary-android", version.ref = "cloudinaryAndroid" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
@@ -84,6 +91,7 @@ play-services-analytics-impl = { group = "com.google.android.gms", name = "play-
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 cloudinary-android-core = { group = "com.cloudinary", name = "cloudinary-android-core", version.ref = "cloudinaryAndroidCore" }
 play-services-cast-tv = { group = "com.google.android.gms", name = "play-services-cast-tv", version.ref = "playServicesCastTv" }
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
