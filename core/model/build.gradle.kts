@@ -4,8 +4,9 @@ plugins {
 
 dependencies {
 
+    implementation(libs.protolite.well.known.types)
     testImplementation(libs.junit)
-    compileOnly("javax.inject:javax.inject:1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    compileOnly(libs.javax.inject)
+    implementation(libs.kotlinx.coroutines.android.v139)
 
 }

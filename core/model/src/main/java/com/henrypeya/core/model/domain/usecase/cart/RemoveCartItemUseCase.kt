@@ -11,6 +11,6 @@ class RemoveCartItemUseCase @Inject constructor(
     private val cartRepository: CartRepository
 ) {
     suspend operator fun invoke(productId: String) {
-        cartRepository.removeProduct(productId)
+        cartRepository.removeCartItem(productId)
     }
 }

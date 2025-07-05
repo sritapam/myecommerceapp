@@ -33,6 +33,10 @@ class ProductListViewModel @Inject constructor(
     init {
         loadProducts()
 
+        extractCorroutines()
+    }
+
+    private fun extractCorroutines() {
         viewModelScope.launch {
             combine(
                 _allProducts,
@@ -47,8 +51,10 @@ class ProductListViewModel @Inject constructor(
                     allProducts
                 } else {
                     allProducts.filter { product ->
-                        StringUtils.normalizeAccentsAndLowercase(product.name).contains(normalizedSearchQuery) ||
-                                StringUtils.normalizeAccentsAndLowercase(product.description).contains(normalizedSearchQuery)
+                        StringUtils.normalizeAccentsAndLowercase(product.name)
+                            .contains(normalizedSearchQuery) ||
+                                StringUtils.normalizeAccentsAndLowercase(product.description)
+                                    .contains(normalizedSearchQuery)
                     }
                 }
 
@@ -56,13 +62,26 @@ class ProductListViewModel @Inject constructor(
                     searchFiltered
                 } else {
                     searchFiltered.filter { product ->
-                        val normalizedProductName = StringUtils.normalizeAccentsAndLowercase(product.name)
+                        val normalizedProductName =
+                            StringUtils.normalizeAccentsAndLowercase(product.name)
 
                         when (selectedCategory) {
-                            ProductCategory.COFFEE -> normalizedProductName.contains("cafe") || normalizedProductName.contains("espresso")
-                            ProductCategory.SNACKS -> normalizedProductName.contains("galletas") || normalizedProductName.contains("brownie") || normalizedProductName.contains("muffin")
-                            ProductCategory.DRINKS -> normalizedProductName.contains("jugo") || normalizedProductName.contains("smoothie") || normalizedProductName.contains("te")
-                            ProductCategory.BAKERY -> normalizedProductName.contains("muffin") || normalizedProductName.contains("brownie")
+                            ProductCategory.COFFEE -> normalizedProductName.contains("cafe") || normalizedProductName.contains(
+                                "espresso"
+                            )
+
+                            ProductCategory.SNACKS -> normalizedProductName.contains("galletas") || normalizedProductName.contains(
+                                "brownie"
+                            ) || normalizedProductName.contains("muffin")
+
+                            ProductCategory.DRINKS -> normalizedProductName.contains("jugo") || normalizedProductName.contains(
+                                "smoothie"
+                            ) || normalizedProductName.contains("te")
+
+                            ProductCategory.BAKERY -> normalizedProductName.contains("muffin") || normalizedProductName.contains(
+                                "brownie"
+                            )
+
                             else -> true
                         }
                     }

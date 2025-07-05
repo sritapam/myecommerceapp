@@ -31,6 +31,7 @@ import com.henrypeya.feature_auth.ui.AuthViewModel
 import com.henrypeya.feature_auth.ui.LoginScreen
 import com.henrypeya.feature_auth.ui.RegisterScreen
 import com.henrypeya.feature_cart.ui.CartScreen
+import com.henrypeya.feature_order_history.ui.OrderHistoryScreen
 import com.henrypeya.feature_product_list.ui.ProductListScreen
 import com.henrypeya.feature_profile.ui.ProfileScreen
 import kotlinx.coroutines.flow.first
@@ -128,12 +129,7 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                     CartScreen(navController = navController)
                 }
                 composable("order_history_route") { // Ruta del historial de pedidos (a crear)
-                    Text(
-                        "Order History Screen Placeholder",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center)
-                    )
+                    OrderHistoryScreen(navController = navController)
                 }
                 // TODO: añadir más rutas según sea necesario
             }

@@ -322,7 +322,7 @@ fun ProfileScreen(
                                     withDismissAction = true
                                 )
                             }
-                            //TODO navController.navigate("order_history_route")
+                            navController.navigate("order_history_route")
                         },
                         modifier = Modifier.weight(1f)
                     ) {

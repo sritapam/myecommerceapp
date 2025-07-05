@@ -1,8 +1,12 @@
 package com.example.myecommerceapp.di
 
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.room.Room
+import androidx.work.WorkerFactory
 import com.henrypeya.data.local.AppDatabase
+import com.henrypeya.data.local.dao.CartDao
+import com.henrypeya.data.local.dao.OrderDao
 import com.henrypeya.data.local.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -29,7 +33,7 @@ object AppModuleProviders {
             AppDatabase::class.java,
             "ecommerce_app_database"
         )
-            // .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -37,5 +41,25 @@ object AppModuleProviders {
     @Singleton
     fun provideUserDao(database: AppDatabase): UserDao {
         return database.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCartDao(database: AppDatabase): CartDao {
+        return database.cartDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrderDao(database: AppDatabase): OrderDao {
+        return database.orderDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkerFactory(
+        hiltWorkerFactory: HiltWorkerFactory
+    ): WorkerFactory {
+        return hiltWorkerFactory
     }
 }

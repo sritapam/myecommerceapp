@@ -1,4 +1,4 @@
-package com.henrypeya.data.repository.cart
+package com.henrypeya.data
 
 import com.henrypeya.core.model.domain.model.cart.CartItem
 import com.henrypeya.core.model.domain.repository.cart.CartRepository
@@ -37,7 +37,7 @@ class FakeCartRepositoryImpl @Inject constructor() : CartRepository {
         println("FakeCartRepository: Added/Updated product '${product.name}'. Current cart: ${_cartItems.value.size} items.")
     }
 
-    override suspend fun removeProduct(productId: String) {
+    override suspend fun removeCartItem(productId: String) {
         delay(50)
         _cartItems.update { currentItems ->
             currentItems.filter { it.product.id != productId }
@@ -45,7 +45,7 @@ class FakeCartRepositoryImpl @Inject constructor() : CartRepository {
         println("FakeCartRepository: Removed product ID '$productId'. Current cart: ${_cartItems.value.size} items.")
     }
 
-    override suspend fun updateQuantity(productId: String, newQuantity: Int) {
+    override suspend fun updateCartItemQuantity(productId: String, newQuantity: Int) {
         delay(50)
         _cartItems.update { currentItems ->
             if (newQuantity <= 0) {

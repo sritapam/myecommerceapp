@@ -2,10 +2,12 @@ package com.example.myecommerceapp.di
 
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import com.henrypeya.core.model.domain.repository.cart.CartRepository
+import com.henrypeya.core.model.domain.repository.order.OrderRepository
 import com.henrypeya.core.model.domain.repository.product.ProductRepository
 import com.henrypeya.core.model.domain.repository.user.UserRepository
 import com.henrypeya.data.repository.auth.AuthRepositoryImpl
-import com.henrypeya.data.repository.cart.FakeCartRepositoryImpl
+import com.henrypeya.data.repository.cart.CartRepositoryImpl
+import com.henrypeya.data.repository.order.OrderRepositoryImpl
 import com.henrypeya.data.repository.product.FakeProductRepositoryImpl
 import com.henrypeya.data.repository.user.UserRepositoryImpl
 import com.henrypeya.data.service.imageupload.CloudinaryService
@@ -34,7 +36,7 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindCartRepository(
-        fakeCartRepositoryImpl: FakeCartRepositoryImpl
+        cartRepositoryImpl: CartRepositoryImpl
     ): CartRepository
 
     @Binds
@@ -48,4 +50,10 @@ abstract class AppModule {
     abstract fun bindCloudinaryService(
         cloudinaryService: CloudinaryServiceImpl
     ): CloudinaryService
+
+    @Binds
+    @Singleton // If you want a single instance throughout the app
+    abstract fun bindOrderRepository(
+        orderRepositoryImpl: OrderRepositoryImpl
+    ): OrderRepository
 }
