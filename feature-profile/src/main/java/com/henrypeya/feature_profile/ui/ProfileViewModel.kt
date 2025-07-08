@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.model.user.User
+import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import com.henrypeya.core.model.domain.repository.user.UserRepository
 import com.henrypeya.feature_profile.ui.state.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 open class ProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -47,7 +49,6 @@ open class ProfileViewModel @Inject constructor(
                 _editableEmail.value = user.email
                 _editableNationality.value = user.nationality
             }
-            Log.d("ProfileViewModel", "User profile loaded: ${_uiState.value.user}")
         }
     }
 
@@ -118,7 +119,6 @@ open class ProfileViewModel @Inject constructor(
                         errorMessage = "Imagen subida exitosamente."
                     )
                 }
-                Log.d("ProfileViewModel", "Image upload finished. New URL set in UI state: $imageUrl")
 
                 _uiState.update {
                     it.copy(
@@ -133,7 +133,17 @@ open class ProfileViewModel @Inject constructor(
                         showImageUploadProgress = false
                     )
                 }
-                Log.e("ProfileViewModel", "Error uploading image: ${e.localizedMessage ?: "Desconocido"}")
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                authRepository.logout()
+                _uiState.update { it.copy(errorMessage = "Sesión cerrada exitosamente.") }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = "Error al cerrar sesión: ${e.localizedMessage ?: "Desconocido"}") }
             }
         }
     }

@@ -18,8 +18,6 @@ class MyApp: Application(){
         config["cloud_name"] = BuildConfig.CLOUDINARY_CLOUD_NAME
         config["api_key"] = BuildConfig.CLOUDINARY_API_KEY
 
-        Log.d("CloudinaryInit", "Attempting to initialize Cloudinary with config: $config")
-
         try {
             MediaManager.init(this, config)
             Log.i("CloudinaryInit", "Cloudinary MediaManager initialized successfully.")

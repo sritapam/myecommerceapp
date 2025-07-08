@@ -1,4 +1,4 @@
-package com.henrypeya.feature_auth.ui
+package com.henrypeya.feature_auth.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,7 +61,7 @@ fun LoginScreen(
     val passwordError by viewModel.passwordError.collectAsStateWithLifecycle()
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
 
-    var passwordVisible by rememberSaveable { mutableStateOf(false) } // (soporta rotación)
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -105,7 +105,7 @@ fun LoginScreen(
                 onValueChange = viewModel::onEmailChange,
                 label = { Text("Email") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                isError = emailError != null, // Indica si hay un error para aplicar estilo visual
+                isError = emailError != null,
                 modifier = Modifier.fillMaxWidth()
             )
             // Mostrar mensaje de error si existe

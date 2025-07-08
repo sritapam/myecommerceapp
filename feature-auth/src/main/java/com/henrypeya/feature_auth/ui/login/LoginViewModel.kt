@@ -1,4 +1,4 @@
-package com.henrypeya.feature_auth.ui
+package com.henrypeya.feature_auth.ui.login
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -33,7 +33,6 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
-    //Flag para habilitar el botón de login
     val isFormValid: StateFlow<Boolean> =
         combine(
             email,
@@ -113,7 +112,7 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     }
 
     fun errorShown() {
-        _loginState.value = LoginState.Idle // Resetea el estado a Idle después de mostrar el error
+        _loginState.value = LoginState.Idle
     }
 
 }

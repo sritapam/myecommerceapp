@@ -153,7 +153,6 @@ fun ProfileScreen(
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                Log.d("ProfileScreen", "Current imageUrl in UI: ${uiState.user.imageUrl}")
                 if (!uiState.user.imageUrl.isNullOrEmpty()) {
                     SubcomposeAsyncImage(
                         model = uiState.user.imageUrl,
@@ -162,7 +161,6 @@ fun ProfileScreen(
                         contentScale = ContentScale.Crop,
                         loading = { CircularProgressIndicator() },
                         error = {
-                            Log.e("ProfileScreen", "Error loading image: ${uiState.user.imageUrl}")
                             Image(
                                 imageVector = Icons.Filled.CameraAlt,
                                 contentDescription = "Error al cargar imagen",
@@ -315,22 +313,20 @@ fun ProfileScreen(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
-                        onClick = {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "La funcionalidad de Historial de Pedidos aún no está implementada.",
-                                    withDismissAction = true
-                                )
-                            }
-                            navController.navigate("order_history_route")
-                        },
+                        onClick = { navController.navigate("order_history_route") },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Historial de Pedidos")
                     }
                 }
             }
-
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = viewModel::logout,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Cerrar Sesión")
+            }
             if (uiState.showImageUploadProgress) {
                 Spacer(modifier = Modifier.height(16.dp))
                 CircularProgressIndicator()

@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,15 +21,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navigation
 import com.henrypeya.feature_auth.ui.AuthViewModel
-import com.henrypeya.feature_auth.ui.LoginScreen
-import com.henrypeya.feature_auth.ui.RegisterScreen
+import com.henrypeya.feature_auth.ui.login.LoginScreen
+import com.henrypeya.feature_auth.ui.register.RegisterScreen
 import com.henrypeya.feature_cart.ui.CartScreen
 import com.henrypeya.feature_order_history.ui.OrderHistoryScreen
 import com.henrypeya.feature_product_list.ui.ProductListScreen
@@ -50,26 +49,51 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
             "AppNavHost",
             "Initial login status: $loggedInStatus, navigating to: $actualStartDestination"
         )
-        navController.navigate(actualStartDestination) {
-            popUpTo(navController.graph.id) {
-                inclusive = true
-                saveState = false
+        if (navController.currentDestination?.route != actualStartDestination) {
+            navController.navigate(actualStartDestination) {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                    saveState = false
+                }
+                launchSingleTop = true
+                restoreState = false
             }
-            launchSingleTop = true
-            restoreState = false
+        }
+    }
+
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            if (navController.currentDestination?.route != "main_app_graph") {
+                navController.navigate("main_app_graph") {
+                    Log.d("AppNavHost", "Login state changed to true, navigating to main_app_graph")
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+        } else {
+            if (navController.currentDestination?.route != "login_route") {
+                Log.d("AppNavHost", "Login state changed to false, navigating to login_route")
+                navController.navigate("login_route") {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
         }
     }
 
     val bottomNavItems = listOf(
         BottomNavItem("products", "Productos", Icons.Filled.Home),
+        BottomNavItem("cart_route", "Carrito", Icons.Filled.ShoppingCart),
         BottomNavItem("profile", "Perfil", Icons.Filled.Person)
     )
 
-    // Solo muestra el Scaffold con BottomBar si no estamos en la ruta de Login/Register/Loading
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val showBottomBar = currentDestination?.route in bottomNavItems.map { it.route } ||
-            currentDestination?.hierarchy?.any { it.route == "main_app_graph" } == true
+    val showBottomBar = currentDestination?.hierarchy?.any { it.route == "main_app_graph" } == true
 
     Scaffold(
         bottomBar = {
@@ -83,12 +107,16 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                             label = { Text(item.label) },
                             selected = isSelected,
                             onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                                if (currentDestination?.route != item.route) {
+                                    navController.navigate(item.route) {
+                                        popUpTo("main_app_graph") {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = false
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                } else {
+                                    Log.d("BottomNav", "Already at ${item.label}. No navigation needed.")
                                 }
                             }
                         )
@@ -117,7 +145,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                 RegisterScreen(navController = navController)
             }
 
-            // pantallas con Bottom Bar
             navigation(startDestination = "products", route = "main_app_graph") {
                 composable("products") {
                     ProductListScreen(navController = navController)
@@ -131,7 +158,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                 composable("order_history_route") { // Ruta del historial de pedidos (a crear)
                     OrderHistoryScreen(navController = navController)
                 }
-                // TODO: añadir más rutas según sea necesario
             }
         }
     }

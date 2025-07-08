@@ -1,8 +1,7 @@
-package com.henrypeya.feature_auth.ui
+package com.henrypeya.feature_auth.ui.register
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -31,14 +30,12 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    // Observar estados del ViewModel
     val fullName by viewModel.fullName.collectAsStateWithLifecycle()
     val email by viewModel.email.collectAsStateWithLifecycle()
     val password by viewModel.password.collectAsStateWithLifecycle()
     val confirmPassword by viewModel.confirmPassword.collectAsStateWithLifecycle()
     val registerState by viewModel.registerState.collectAsStateWithLifecycle()
 
-    // Observar errores por campo
     val fullNameError by viewModel.fullNameError.collectAsStateWithLifecycle()
     val emailError by viewModel.emailError.collectAsStateWithLifecycle()
     val passwordError by viewModel.passwordError.collectAsStateWithLifecycle()
@@ -56,11 +53,10 @@ fun RegisterScreen(
             RegisterState.Success -> {
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        message = "Registro exitoso. Inicia sesión.",
+                        message = "Registro exitoso. Iniciando sesión automáticamente...",
                         withDismissAction = true
                     )
                 }
-                navController.popBackStack() // Navega de regreso a la pantalla de Login
             }
             is RegisterState.Error -> {
                 val errorMessage = (registerState as RegisterState.Error).message
@@ -191,7 +187,7 @@ fun RegisterScreen(
             // Botón de Registro
             Button(
                 onClick = viewModel::register,
-                enabled = isFormValid && registerState !is RegisterState.Loading, // Habilitado solo si es válido y no está cargando
+                enabled = isFormValid && registerState !is RegisterState.Loading,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (registerState is RegisterState.Loading) {

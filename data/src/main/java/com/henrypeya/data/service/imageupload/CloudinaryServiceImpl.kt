@@ -37,7 +37,6 @@ class CloudinaryServiceImpl @Inject constructor(
                 } else if (imageData is String && (imageData.startsWith("http") || imageData.startsWith("content://") || imageData.startsWith("file://"))) {
                     Uri.parse(imageData)
                 } else {
-                    Log.e("CloudinaryService", "Unsupported imageData type: ${imageData.javaClass.name}")
                     continuation.resumeWithException(IllegalArgumentException("Tipo de imagen no soportado para la subida."))
                     return@suspendCancellableCoroutine
                 }

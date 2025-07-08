@@ -84,11 +84,6 @@ fun ProductListScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Catálogo de Productos") },
-                actions = {
-                    IconButton(onClick = { navController.navigate("cart_route") }) {
-                        Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito de Compras")
-                    }
-                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

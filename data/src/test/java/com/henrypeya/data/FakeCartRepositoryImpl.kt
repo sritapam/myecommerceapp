@@ -34,7 +34,6 @@ class FakeCartRepositoryImpl @Inject constructor() : CartRepository {
                 currentItems + CartItem(product = product, quantity = 1)
             }
         }
-        println("FakeCartRepository: Added/Updated product '${product.name}'. Current cart: ${_cartItems.value.size} items.")
     }
 
     override suspend fun removeCartItem(productId: String) {
@@ -42,7 +41,6 @@ class FakeCartRepositoryImpl @Inject constructor() : CartRepository {
         _cartItems.update { currentItems ->
             currentItems.filter { it.product.id != productId }
         }
-        println("FakeCartRepository: Removed product ID '$productId'. Current cart: ${_cartItems.value.size} items.")
     }
 
     override suspend fun updateCartItemQuantity(productId: String, newQuantity: Int) {
@@ -60,12 +58,10 @@ class FakeCartRepositoryImpl @Inject constructor() : CartRepository {
                 }
             }
         }
-        println("FakeCartRepository: Updated quantity for product ID '$productId' to $newQuantity. Current cart: ${_cartItems.value.size} items.")
     }
 
     override suspend fun clearCart() {
         delay(50)
         _cartItems.update { emptyList() }
-        println("FakeCartRepository: Cart cleared.")
     }
 }

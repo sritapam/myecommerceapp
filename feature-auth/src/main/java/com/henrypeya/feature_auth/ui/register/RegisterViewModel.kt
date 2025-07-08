@@ -1,4 +1,4 @@
-package com.henrypeya.feature_auth.ui
+package com.henrypeya.feature_auth.ui.register
 
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
@@ -18,7 +18,6 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
 
-    // Estados para los campos del formulario
     private val _fullName = MutableStateFlow("")
     val fullName: StateFlow<String> = _fullName.asStateFlow()
 
@@ -31,7 +30,6 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
     private val _confirmPassword = MutableStateFlow("")
     val confirmPassword: StateFlow<String> = _confirmPassword.asStateFlow()
 
-    // Estados para los mensajes de error por campo
     private val _fullNameError = MutableStateFlow<String?>(null)
     val fullNameError: StateFlow<String?> = _fullNameError.asStateFlow()
 
@@ -44,11 +42,9 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
     private val _confirmPasswordError = MutableStateFlow<String?>(null)
     val confirmPasswordError: StateFlow<String?> = _confirmPasswordError.asStateFlow()
 
-    // Estado general del proceso de registro
     private val _registerState = MutableStateFlow<RegisterState>(RegisterState.Idle)
     val registerState: StateFlow<RegisterState> = _registerState.asStateFlow()
 
-    // Flag que indica si el formulario completo es válido
     val isFormValid: StateFlow<Boolean> = combine(
         fullName, email, password, confirmPassword,
         fullNameError, emailError, passwordError, confirmPasswordError
@@ -57,10 +53,10 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
         val currentEmail = values[1] as String
         val currentPassword = values[2] as String
         val currentConfirmPassword = values[3] as String
-        val currentFullNameErr = values[4] as String?
-        val currentEmailErr = values[5] as String?
-        val currentPasswordErr = values[6] as String?
-        val currentConfirmPasswordErr = values[7] as String?
+        val currentFullNameErr = values[4]
+        val currentEmailErr = values[5]
+        val currentPasswordErr = values[6]
+        val currentConfirmPasswordErr = values[7]
 
         currentFullName.isNotBlank() && currentEmail.isNotBlank() &&
                 currentPassword.isNotBlank() && currentConfirmPassword.isNotBlank() &&
@@ -84,7 +80,6 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
     fun onPasswordChange(newPassword: String) {
         _password.value = newPassword
         validatePassword(newPassword)
-        // Re-validar la confirmación de contraseña si la contraseña cambia
         validateConfirmPassword(_confirmPassword.value)
     }
 
@@ -156,11 +151,10 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
             return
         }
 
-        _registerState.value = RegisterState.Loading //  registro está en progreso
+        _registerState.value = RegisterState.Loading
         viewModelScope.launch {
             try {
-                //TODO el AuthRepository registraría el usuario, por ahora, solo simulamos éxito
-                val success = authRepository.register(email.value, password.value) // Asumiendo un método register en AuthRepository
+                val success = authRepository.register(email.value, password.value)
 
                 if (success) {
                     _registerState.value = RegisterState.Success
