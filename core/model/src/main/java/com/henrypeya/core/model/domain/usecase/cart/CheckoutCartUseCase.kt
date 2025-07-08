@@ -13,7 +13,7 @@ class CheckoutCartUseCase @Inject constructor(
     private val orderRepository: OrderRepository
 ) {
     suspend operator fun invoke() {
-        val currentCartItems = cartRepository.getCartItems().first() // Obtener los ítems actuales del carrito
+        val currentCartItems = cartRepository.getCartItems().first()
 
         if (currentCartItems.isEmpty()) {
             throw Exception("El carrito está vacío. No se puede procesar la compra.")
@@ -34,7 +34,7 @@ class CheckoutCartUseCase @Inject constructor(
             products = orderItems
         )
 
-        orderRepository.saveOrder(newOrder) // Guarda la orden de dominio
-        cartRepository.clearCart() // Limpia el carrito
+        orderRepository.saveOrder(newOrder)
+        cartRepository.clearCart()
     }
 }

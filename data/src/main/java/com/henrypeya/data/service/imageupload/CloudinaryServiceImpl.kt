@@ -41,7 +41,6 @@ class CloudinaryServiceImpl @Inject constructor(
                     return@suspendCancellableCoroutine
                 }
             } catch (e: Exception) {
-                Log.e("CloudinaryService", "Error preparing image data: ${e.message}", e)
                 continuation.resumeWithException(Exception("Error al preparar la imagen para la subida: ${e.localizedMessage}", e))
                 return@suspendCancellableCoroutine
             }
@@ -52,22 +51,18 @@ class CloudinaryServiceImpl @Inject constructor(
                     .unsigned("imagepeya")
                     .callback(object : UploadCallback {
                         override fun onStart(requestId: String) {
-                            Log.d("CloudinaryService", "Upload started: $requestId")
                         }
 
                         override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {
                             val progress = (bytes * 100 / totalBytes).toInt()
-                            Log.d("CloudinaryService", "Upload progress: $progress%")
                         }
 
                         override fun onSuccess(requestId: String, resultData: Map<*, *>?) {
                             val url = resultData?.get("secure_url") as? String
                             if (url != null) {
-                                Log.i("CloudinaryService", "Upload successful. URL: $url")
                                 continuation.resume(url)
                             } else {
                                 val errorMsg = "Upload successful but secure_url is missing."
-                                Log.e("CloudinaryService", errorMsg)
                                 continuation.resumeWithException(IllegalStateException(errorMsg))
                             }
                             if (imageData is Bitmap) {
@@ -80,7 +75,6 @@ class CloudinaryServiceImpl @Inject constructor(
 
                         override fun onError(requestId: String, error: ErrorInfo) {
                             val errorMsg = "Upload failed: ${error.description}"
-                            Log.e("CloudinaryService", errorMsg)
                             continuation.resumeWithException(Exception(errorMsg))
                             if (imageData is Bitmap) {
                                 val tempFile = (dataToUpload as? Uri)?.path?.let { File(it) }
@@ -97,7 +91,6 @@ class CloudinaryServiceImpl @Inject constructor(
 
                 request.dispatch()
             } catch (e: Exception) {
-                Log.e("CloudinaryService", "Error during Cloudinary upload process: ${e.message}", e)
                 continuation.resumeWithException(Exception("Error en el proceso de subida de Cloudinary: ${e.localizedMessage}", e))
                 if (imageData is Bitmap) {
                     val tempFile = (dataToUpload as? Uri)?.path?.let { File(it) }

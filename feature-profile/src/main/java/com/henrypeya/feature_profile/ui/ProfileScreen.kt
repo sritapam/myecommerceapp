@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -145,7 +144,6 @@ fun ProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Círculo de la imagen de perfil
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -274,7 +272,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Botones de acción (Editar/Guardar/Cancelar/Historial)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
@@ -335,7 +332,6 @@ fun ProfileScreen(
         }
     }
 
-    // Diálogos de solicitud de permisos
     if (showCameraPermissionDialog) {
         PermissionDialog(
             onDismissRequest = { showCameraPermissionDialog = false },

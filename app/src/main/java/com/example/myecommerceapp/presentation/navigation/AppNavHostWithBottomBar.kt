@@ -155,7 +155,7 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                 composable("cart_route") {
                     CartScreen(navController = navController)
                 }
-                composable("order_history_route") { // Ruta del historial de pedidos (a crear)
+                composable("order_history_route") {
                     OrderHistoryScreen(navController = navController)
                 }
             }

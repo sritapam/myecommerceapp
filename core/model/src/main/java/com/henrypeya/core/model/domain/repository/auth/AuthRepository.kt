@@ -4,6 +4,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * Repository interface for authentication operations.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 interface AuthRepository {
     suspend fun login(email: String, password: String): Boolean

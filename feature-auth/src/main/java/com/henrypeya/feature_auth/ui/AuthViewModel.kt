@@ -14,9 +14,7 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     val isLoggedInState: StateFlow<Boolean> = authRepository.isLoggedInState
-
     fun isLoggedIn() = authRepository.isLoggedIn()
-
     fun logout() {
         authRepository.logout()
     }

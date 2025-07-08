@@ -8,10 +8,6 @@ import androidx.room.Update
 import com.henrypeya.data.local.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Data Access Object (DAO) para la entidad UserEntity.
- * Define los métodos para interactuar con la tabla 'users' en la base de datos.
- */
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

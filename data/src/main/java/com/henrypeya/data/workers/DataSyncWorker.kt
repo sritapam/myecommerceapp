@@ -1,6 +1,7 @@
 package com.henrypeya.data.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -9,6 +10,7 @@ import com.henrypeya.data.local.AppDatabase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
@@ -21,24 +23,32 @@ class DataSyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        Log.d("DataSyncWorker", "Iniciando ejecución de DataSyncWorker...")
         try {
-            // --- Lógica de sincronización o mantenimiento de la BD ---
-            // Aquí puedes:
-            // 1. Verificar si hay órdenes nuevas y sincronizarlas con un backend (si tuvieras uno).
-            // 2. Realizar limpieza de datos antiguos.
-            // 3. Verificar la versión de la BD y, si fuera necesario en un escenario real,
-            //    ejecutar lógica de migración compleja o notificar al usuario.
+            val needsSync = (System.currentTimeMillis() % 3 == 0L)
+            val needsMigration = (System.currentTimeMillis() % 5 == 0L)
 
-            // Ejemplo: Contar órdenes (solo para demostrar el acceso a la BD)
-            val totalOrders = orderRepository.getAllOrders().first().size
+            if (needsSync) {
+                Log.i("DataSyncWorker", "Simulando detección de nuevas entidades o cambios.")
+                delay(2000)
+                val totalOrders = orderRepository.getAllOrders().first().size
+                Log.i("DataSyncWorker", "Sincronización simulada completada. Órdenes actuales: $totalOrders")
+            } else {
+                Log.d("DataSyncWorker", "No se detectaron nuevas entidades o cambios que requieran sincronización.")
+            }
 
-            // Ejemplo: Simular un error para ver el comportamiento de WorkManager
-            // if (System.currentTimeMillis() % 2 == 0L) {
-            //     throw Exception("Simulando un error en la sincronización")
-            // }
+            if (needsMigration) {
+                Log.w("DataSyncWorker", "Simulando detección de cambio de versión o necesidad de migración/limpieza.")
+                delay(3000) // Simular un retardo de migración/limpieza
+                Log.w("DataSyncWorker", "Migración/limpieza simulada completada.")
+            } else {
+                Log.d("DataSyncWorker", "No se detectó necesidad de migración/limpieza.")
+            }
 
+            Log.d("DataSyncWorker", "Ejecución de DataSyncWorker finalizada con éxito.")
             Result.success()
         } catch (e: Exception) {
+            Log.e("DataSyncWorker", "Error durante la ejecución de DataSyncWorker: ${e.localizedMessage}", e)
             e.printStackTrace()
             Result.failure()
         }

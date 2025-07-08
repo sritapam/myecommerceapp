@@ -12,26 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.henrypeya.core.model.domain.model.cart.CartItem
-import com.henrypeya.core.model.domain.model.product.Product
-import com.henrypeya.core.model.domain.repository.cart.CartRepository
-import com.henrypeya.core.model.domain.repository.order.OrderRepository
-import com.henrypeya.core.model.domain.usecase.cart.AddToCartUseCase
-import com.henrypeya.core.model.domain.usecase.cart.ClearCartUseCase
-import com.henrypeya.core.model.domain.usecase.cart.GetCartItemsUseCase
-import com.henrypeya.core.model.domain.usecase.cart.RemoveCartItemUseCase
-import com.henrypeya.core.model.domain.usecase.cart.UpdateCartItemQuantityUseCase
-import com.henrypeya.core.ui.MyEcommerceAppTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,7 +90,6 @@ fun CartScreen(
                     }
                 }
 
-                // Sección del total y botón de checkout al final
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -155,7 +140,6 @@ fun CartItemRow(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Imagen del producto
             AsyncImage(
                 model = cartItem.product.imageUrl,
                 contentDescription = cartItem.product.name,
@@ -167,11 +151,16 @@ fun CartItemRow(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(cartItem.product.name, style = MaterialTheme.typography.titleMedium)
-                Text("Precio: $${String.format("%.2f", cartItem.product.price)}", style = MaterialTheme.typography.bodyMedium)
-                Text("Total Ítem: $${String.format("%.2f", cartItem.calculateTotalPrice())}", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    "Precio: $${String.format("%.2f", cartItem.product.price)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "Total Ítem: $${String.format("%.2f", cartItem.calculateTotalPrice())}",
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
-            // Controles de cantidad
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)

@@ -53,13 +53,8 @@ android {
         viewBinding = true
         buildConfig = true
     }
-    // Añadir composeOptions aquí si no está ya
     composeOptions {
-        // ESTA VERSIÓN DEBE COINCIDIR CON LA VERSIÓN DEL COMPILADOR DE KOTLIN QUE USA TU COMPOSE BOM
-        // Para compose-bom:2023.08.00, la versión común es 1.5.1
-        // Si usas una BOM más reciente (ej. 2024.04.00), puede ser 1.5.11 o superior.
-        // VERIFICA TU libs.versions.toml para la versión de compose-bom y busca la tabla de compatibilidad.
-        kotlinCompilerExtensionVersion = "1.5.1" // <--- ¡IMPORTANTE!
+         kotlinCompilerExtensionVersion = "1.5.1"
     }
 }
 
@@ -77,14 +72,12 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.constraintlayout)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
-
-    implementation(libs.play.services.analytics.impl)
-    implementation(libs.play.services.cast.tv) // Mantengo si lo necesitas
+    kapt(libs.androidx.hilt.compiler)
 
     // Cloudinary
     implementation(libs.cloudinary.android.core)
@@ -108,8 +101,11 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.foundation)
 
-    implementation(libs.androidx.work.runtime.ktx.v290)
+    implementation (libs.kotlinx.coroutines.android.v173)
+    implementation (libs.kotlinx.coroutines.core.v173)
+    implementation (libs.androidx.lifecycle.runtime.ktx.v262)
 
+    implementation (libs.androidx.work.runtime.ktx.v290)
     // Módulos de tu proyecto
     implementation(project(":feature-cart"))
     implementation(project(":feature-auth"))

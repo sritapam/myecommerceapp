@@ -93,7 +93,7 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Campo Nombre Completo
+
             OutlinedTextField(
                 value = fullName,
                 onValueChange = viewModel::onFullNameChange,
@@ -111,7 +111,6 @@ fun RegisterScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo Email
             OutlinedTextField(
                 value = email,
                 onValueChange = viewModel::onEmailChange,
@@ -130,7 +129,6 @@ fun RegisterScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo Contraseña
             OutlinedTextField(
                 value = password,
                 onValueChange = viewModel::onPasswordChange,
@@ -157,7 +155,6 @@ fun RegisterScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo Confirmar Contraseña
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
@@ -184,7 +181,6 @@ fun RegisterScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón de Registro
             Button(
                 onClick = viewModel::register,
                 enabled = isFormValid && registerState !is RegisterState.Loading,

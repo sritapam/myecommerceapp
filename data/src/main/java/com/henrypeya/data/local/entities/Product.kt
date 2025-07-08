@@ -1,6 +1,9 @@
 package com.henrypeya.data.local.entities
 
-//data class Product simple y usaremos un TypeConverter para serializar/deserializar la lista a/desde un String JSON
+/**
+ * Represents a product entity for local storage.
+ * Used to store and retrieve product information efficiently.
+ */
 data class Product(
     val productId: String,
     val name: String,

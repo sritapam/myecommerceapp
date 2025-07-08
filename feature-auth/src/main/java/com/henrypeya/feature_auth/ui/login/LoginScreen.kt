@@ -99,7 +99,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Campo de Email
             OutlinedTextField(
                 value = email,
                 onValueChange = viewModel::onEmailChange,
@@ -108,7 +107,6 @@ fun LoginScreen(
                 isError = emailError != null,
                 modifier = Modifier.fillMaxWidth()
             )
-            // Mostrar mensaje de error si existe
             emailError?.let {
                 Text(
                     text = it,
@@ -119,7 +117,6 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo de Contraseña
             OutlinedTextField(
                 value = password,
                 onValueChange = viewModel::onPasswordChange,
@@ -136,10 +133,9 @@ fun LoginScreen(
                         Icon(imageVector = image, description)
                     }
                 },
-                isError = passwordError != null, // Indica si hay un error para aplicar estilo visual
+                isError = passwordError != null,
                 modifier = Modifier.fillMaxWidth()
             )
-            // Mostrar mensaje de error si existe
             passwordError?.let {
                 Text(
                     text = it,
@@ -150,7 +146,6 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón de Iniciar Sesión (habilitado solo si el formulario es válido y no está cargando)
             Button(
                 onClick = viewModel::login,
                 enabled = isFormValid && loginState !is LoginState.Loading, // Habilitado solo si es válido y no está cargando
@@ -168,7 +163,6 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón para ir a Registro
             TextButton(onClick = { navController.navigate("register_route") }) {
                 Text("¿No tenes cuenta? Regístrate")
             }

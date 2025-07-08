@@ -52,7 +52,7 @@ abstract class AppModule {
     ): CloudinaryService
 
     @Binds
-    @Singleton // If you want a single instance throughout the app
+    @Singleton
     abstract fun bindOrderRepository(
         orderRepositoryImpl: OrderRepositoryImpl
     ): OrderRepository

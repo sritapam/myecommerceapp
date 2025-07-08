@@ -64,9 +64,6 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
                 currentPasswordErr == null && currentConfirmPasswordErr == null
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-
-// --- Funciones para actualizar el estado de los campos y validar ---
-
     fun onFullNameChange(newFullName: String) {
         _fullName.value = newFullName
         validateFullName(newFullName)
@@ -87,8 +84,6 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
         _confirmPassword.value = newConfirmPassword
         validateConfirmPassword(newConfirmPassword)
     }
-
-    // --- Lógica de Validación---
 
     private fun validateFullName(fullName: String): Boolean {
         if (fullName.isBlank()) {
@@ -138,8 +133,6 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
         return true
     }
 
-    // --- Lógica de Registro ---
-
     fun register() {
         val isFullNameValid = validateFullName(fullName.value)
         val isEmailValid = validateEmail(email.value)
@@ -167,7 +160,6 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
         }
     }
 
-    // Función para resetear el estado del error general
     fun errorShown() {
         _registerState.value = RegisterState.Idle
     }

@@ -43,8 +43,6 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
             currentEmail.isNotBlank() && currentPassword.isNotBlank() && emailErr == null && passwordErr == null
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(500), false)
 
-    // --- Funciones para actualizar el estado de los campos y validar ---
-
     fun onEmailChange(newEmail: String) {
         _email.value = newEmail
         validateEmail(newEmail)
@@ -54,7 +52,6 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         _password.value = newPassword
         validatePassword(newPassword)
     }
-    // --- Lógica de Validación ---
 
     private fun validateEmail(email: String): Boolean {
         if (email.isBlank()) {
@@ -78,11 +75,9 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
             _passwordError.value = "La contraseña debe tener al menos 8 caracteres."
             return false
         }
-        _passwordError.value = null // Si es válida, no hay error
+        _passwordError.value = null
         return true
     }
-
-    // --- Lógica de Login ---
 
     fun login() {
         val isEmailValid = validateEmail(email.value)

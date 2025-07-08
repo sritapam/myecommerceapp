@@ -16,10 +16,15 @@ class CartRepositoryImpl @Inject constructor(
     private val cartDao: CartDao
 ) : CartRepository {
 
+    companion object {
+        private const val INITIAL_QUANTITY = 1
+        private const val MINIMUM_QUANTITY = 0
+    }
+
     override suspend fun addProduct(product: DomainProduct) {
         val existingItemEntity = cartDao.getAllCartItems().first().find { it.productId == product.id }
         if (existingItemEntity != null) {
-            val updatedEntity = existingItemEntity.copy(quantity = existingItemEntity.quantity + 1)
+            val updatedEntity = existingItemEntity.copy(quantity = existingItemEntity.quantity + INITIAL_QUANTITY)
             cartDao.updateCartItem(updatedEntity)
         } else {
             val newItemEntity = CartItemEntity(
@@ -27,19 +32,19 @@ class CartRepositoryImpl @Inject constructor(
                 name = product.name,
                 price = product.price,
                 imageUrl = product.imageUrl,
-                quantity = 1
+                quantity = INITIAL_QUANTITY
             )
             cartDao.insertCartItem(newItemEntity)
         }
     }
 
-    override suspend fun updateCartItemQuantity(productId: String, quantity: Int) {
+    override suspend fun updateCartItemQuantity(productId: String, newQuantity: Int) {
         val existingItemEntity = cartDao.getAllCartItems().first().find { it.productId == productId }
         existingItemEntity?.let {
-            if (quantity > 0) {
-                cartDao.updateCartItem(it.copy(quantity = quantity))
+            if (newQuantity > MINIMUM_QUANTITY) {
+                cartDao.updateCartItem(it.copy(quantity = newQuantity))
             } else {
-                cartDao.deleteCartItem(productId) // Eliminar si la cantidad es 0
+                cartDao.deleteCartItem(productId)
             }
         }
     }
@@ -59,8 +64,6 @@ class CartRepositoryImpl @Inject constructor(
     }
 }
 
-// --- Funciones de Extensión para Mapeo ---
-
 fun CartItemEntity.toDomain(): CartItem {
     return CartItem(
         product = DomainProduct(
@@ -74,7 +77,7 @@ fun CartItemEntity.toDomain(): CartItem {
         quantity = this.quantity
     )
 }
-//insert
+
 fun CartItem.toEntity(): CartItemEntity {
     return CartItemEntity(
         productId = this.product.id,
