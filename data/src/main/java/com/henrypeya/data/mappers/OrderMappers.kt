@@ -5,7 +5,7 @@ import com.henrypeya.core.model.domain.model.product.Product as DomainProduct
 import com.henrypeya.core.model.domain.model.order.OrderItem as DomainOrderItem
 import com.henrypeya.data.local.converters.Converters
 import com.henrypeya.data.local.entities.OrderEntity
-import com.henrypeya.data.local.entities.ProductForRoom
+import com.henrypeya.data.local.entities.OrderItemEntity
 import com.henrypeya.data.remote.dto.order.OrderItemDto
 import com.henrypeya.data.remote.dto.order.OrderRequestDto
 import com.henrypeya.data.remote.dto.order.OrderResponseDto
@@ -14,7 +14,7 @@ import java.util.UUID
 
 fun DomainOrder.toEntity(): OrderEntity {
     val entityProducts = this.products.map { domainOrderItem ->
-        ProductForRoom(
+        OrderItemEntity(
             productId = domainOrderItem.product.id,
             name = domainOrderItem.product.name,
             price = domainOrderItem.product.price,

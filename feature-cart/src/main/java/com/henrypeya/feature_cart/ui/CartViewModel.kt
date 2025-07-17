@@ -3,7 +3,6 @@ package com.henrypeya.feature_cart.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.model.cart.CartItem
-import com.henrypeya.core.model.domain.usecase.cart.AddToCartUseCase
 import com.henrypeya.core.model.domain.usecase.cart.CheckoutCartUseCase
 import com.henrypeya.core.model.domain.usecase.cart.ClearCartUseCase
 import com.henrypeya.core.model.domain.usecase.cart.GetCartItemsUseCase
@@ -12,14 +11,14 @@ import com.henrypeya.core.model.domain.usecase.cart.UpdateCartItemQuantityUseCas
 import com.henrypeya.feature_cart.ui.state.CartState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.henrypeya.core.model.domain.model.product.Product as DomainProduct
-
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
@@ -28,11 +27,16 @@ class CartViewModel @Inject constructor(
     private val removeCartItemUseCase: RemoveCartItemUseCase,
     private val clearCartUseCase: ClearCartUseCase,
     private val checkoutCartUseCase: CheckoutCartUseCase,
-    private val addToCartUseCase: AddToCartUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CartState())
     val uiState: StateFlow<CartState> = _uiState.asStateFlow()
+
+    private val _messageEventFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val messageEventFlow = _messageEventFlow.asSharedFlow()
+
+    private val _navigateEventFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val navigateEventFlow = _navigateEventFlow.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -51,37 +55,13 @@ class CartViewModel @Inject constructor(
         return items.sumOf { it.calculateTotalPrice() }
     }
 
-    fun onAddToCart(product: DomainProduct) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                addToCartUseCase(product)
-                _uiState.update { it.copy(errorMessage = "Producto añadido al carrito.") }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = "Error al añadir al carrito: ${e.localizedMessage}",
-                        isLoading = false
-                    )
-                }
-            } finally {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
     fun onQuantityChange(productId: String, newQuantity: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
                 updateCartItemQuantityUseCase(productId, newQuantity)
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = "Error al actualizar cantidad: ${e.localizedMessage}",
-                        isLoading = false
-                    )
-                }
+                _messageEventFlow.emit("Error al actualizar cantidad: ${e.localizedMessage ?: "Desconocido"}")
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -94,12 +74,7 @@ class CartViewModel @Inject constructor(
             try {
                 removeCartItemUseCase(productId)
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = "Error al eliminar producto: ${e.localizedMessage}",
-                        isLoading = false
-                    )
-                }
+                _messageEventFlow.emit("Error al eliminar producto: ${e.localizedMessage ?: "Desconocido"}")
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -112,12 +87,7 @@ class CartViewModel @Inject constructor(
             try {
                 clearCartUseCase()
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = "Error al vaciar carrito: ${e.localizedMessage}",
-                        isLoading = false
-                    )
-                }
+                _messageEventFlow.emit("Error al vaciar carrito: ${e.localizedMessage ?: "Desconocido"}")
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -129,19 +99,16 @@ class CartViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 checkoutCartUseCase()
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "Compra realizada exitosamente. ¡Gracias!"
-                    )
-                }
+                _messageEventFlow.emit("Compra realizada exitosamente. ¡Gracias!")
+                _navigateEventFlow.emit(Unit)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        errorMessage = "Error al procesar la compra: ${e.localizedMessage ?: "Desconocido"}",
-                        isLoading = false
+                        errorMessage = "Error al procesar la compra: ${e.localizedMessage ?: "Desconocido"}"
                     )
                 }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

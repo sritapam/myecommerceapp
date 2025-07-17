@@ -1,9 +1,14 @@
 package com.henrypeya.data.repository.order
 
+import android.content.Context
 import android.net.http.HttpException
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresExtension
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.henrypeya.core.model.domain.model.order.Order
 import com.henrypeya.core.model.domain.repository.order.OrderRepository
 import com.henrypeya.data.local.dao.OrderDao
@@ -11,17 +16,22 @@ import com.henrypeya.data.remote.api.ApiService
 import com.henrypeya.data.mappers.toDomain
 import com.henrypeya.data.mappers.toEntity
 import com.henrypeya.data.mappers.toRequestDto
+import com.henrypeya.data.workers.DataSyncWorker
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class OrderRepositoryImpl @Inject constructor(
     private val orderDao: OrderDao,
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    @ApplicationContext private val context: Context,
+    private val workManager: WorkManager
 ) : OrderRepository {
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -38,14 +48,11 @@ class OrderRepositoryImpl @Inject constructor(
 
             if (existingOrderEntity != null) {
                 orderDao.updateOrder(entityToSave)
-                Log.d("OrderRepositoryImpl", "Orden local con ID ${order.id} actualizada (sincronizada) tras éxito de API.")
             } else {
-                val localId = orderDao.insertOrder(entityToSave) // Insertamos la nueva orden de la API
-                Log.d("OrderRepositoryImpl", "Orden nueva (${order.id}) guardada localmente (sincronizada) con ID: $localId tras éxito de API.")
+                val localId = orderDao.insertOrder(entityToSave)
             }
 
         } catch (e: HttpException) {
-            Log.e("OrderRepositoryImpl", "Error HTTP al guardar orden ${order.id}: ${e.message}. Guardando localmente como no sincronizada.", e)
             val orderEntity = order.toEntity().copy(isSynced = false)
             orderDao.insertOrder(orderEntity)
         } catch (e: IOException) {
@@ -54,7 +61,6 @@ class OrderRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             val orderEntity = order.toEntity().copy(isSynced = false)
             orderDao.insertOrder(orderEntity)
-            Log.d("OrderRepositoryImpl", "Orden ${order.id} guardada localmente como pendiente de sincronizar.")
         }
     }
 
@@ -68,16 +74,14 @@ class OrderRepositoryImpl @Inject constructor(
             domainOrdersFromApi.forEach { domainOrder ->
                 orderDao.insertOrder(domainOrder.toEntity().copy(isSynced = true, orderIdApi = domainOrder.orderIdApi))
             }
-            emit(domainOrdersFromApi) // Emite las órdenes obtenidas de la API
+            emit(domainOrdersFromApi)
 
         } catch (e: HttpException) {
             val localOrders = orderDao.getAllOrders().first().map { it.toDomain() }
             emit(localOrders)
         } catch (e: IOException) {
-            Log.e("OrderRepositoryImpl", "Error de red al obtener órdenes: ${e.localizedMessage}. Recurriendo a caché local.", e)
             val localOrders = orderDao.getAllOrders().first().map { it.toDomain() }
             emit(localOrders)
-            Log.d("OrderRepositoryImpl", "Emitiendo órdenes desde caché local (fallback por error de red).")
         } catch (e: Exception) {
             val localOrders = orderDao.getAllOrders().first().map { it.toDomain() }
             emit(localOrders)
@@ -102,7 +106,6 @@ class OrderRepositoryImpl @Inject constructor(
                     isSynced = true
                 )
                 orderDao.updateOrder(updatedOrderEntity)
-                Log.d("OrderRepositoryImpl", "Orden local con ID ${order.id} sincronizada exitosamente con ID de API: ${createdOrderResponseDto.id}")
                 true
             } else {
                 val newSyncedEntity = order.toEntity().copy(
@@ -113,14 +116,32 @@ class OrderRepositoryImpl @Inject constructor(
                 true
             }
         } catch (e: HttpException) {
-            Log.e("OrderRepositoryImpl", "Error HTTP al sincronizar orden ${order.id}: ${e.message}", e)
+            enqueueOneTimeSyncWorker()
             false
         } catch (e: IOException) {
-            Log.e("OrderRepositoryImpl", "Error de red al sincronizar orden ${order.id}: ${e.localizedMessage}", e)
+            enqueueOneTimeSyncWorker()
             false
         } catch (e: Exception) {
-            Log.e("OrderRepositoryImpl", "Error inesperado al sincronizar orden ${order.id}: ${e.localizedMessage}", e)
+            enqueueOneTimeSyncWorker()
             false
         }
+    }
+
+    private fun enqueueOneTimeSyncWorker() {
+        val syncConstraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val oneTimeSyncRequest = OneTimeWorkRequest.Builder(DataSyncWorker::class.java)
+            .setConstraints(syncConstraints)
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                10,
+                TimeUnit.MILLISECONDS
+            )
+            .addTag("order_sync_retry")
+            .build()
+
+        workManager.enqueue(oneTimeSyncRequest)
     }
 }

@@ -1,6 +1,7 @@
 package com.henrypeya.data.remote.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.henrypeya.data.remote.api.ApiService
 import dagger.Module
 import dagger.Provides
@@ -73,5 +74,11 @@ object NetworkModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
+        return WorkManager.getInstance(context)
     }
 }

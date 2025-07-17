@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.henrypeya.data.local.AppDatabase
 import com.henrypeya.data.local.dao.CartDao
 import com.henrypeya.data.local.dao.OrderDao
+import com.henrypeya.data.local.dao.ProductDao
 import com.henrypeya.data.local.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -54,6 +55,12 @@ object AppModuleProviders {
     @Singleton
     fun provideOrderDao(database: AppDatabase): OrderDao {
         return database.orderDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideProductDao(database: AppDatabase): ProductDao {
+        return database.productDao()
     }
 
     @Provides

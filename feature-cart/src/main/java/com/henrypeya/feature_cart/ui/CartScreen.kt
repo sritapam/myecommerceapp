@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.henrypeya.core.model.domain.model.cart.CartItem
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,9 +31,44 @@ fun CartScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        viewModel.messageEventFlow.collectLatest { message ->
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = message,
+                    withDismissAction = true
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navigateEventFlow.collectLatest {
+            navController.navigate("products") {
+                popUpTo("main_app_graph") {
+                    inclusive = true
+                }
+                launchSingleTop = true
+                restoreState = false
+            }
+        }
+    }
+
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
             scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = message,
+                    withDismissAction = true
+                )
+            }
+            viewModel.errorMessageShown()
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { message ->
+            scope.launch {//todo ver si uso errores para algo sino eliminar
                 snackbarHostState.showSnackbar(
                     message = message,
                     withDismissAction = true
@@ -186,148 +222,3 @@ fun CartItemRow(
         }
     }
 }
-
-// --- Previews ---
-
-//@Preview(showBackground = true)
-//@Composable
-//fun CartScreenEmptyPreview() {
-//    MyEcommerceAppTheme {
-//        // Para el preview, puedes crear un ViewModel mock que devuelva un estado vacío
-//        // O simplemente envolver el CartScreen con un Surface para simular el fondo
-//        Surface {
-//            CartScreen(navController = rememberNavController(), viewModel = previewCartViewModelEmpty())
-//        }
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun CartScreenWithItemsPreview() {
-//    MyEcommerceAppTheme {
-//        Surface {
-//            CartScreen(navController = rememberNavController(), viewModel = previewCartViewModelWithItems())
-//        }
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun CartItemRowPreview() {
-//    MyEcommerceAppTheme {
-//        CartItemRow(
-//            cartItem = CartItem(
-//                Product(
-//                    id = "P001",
-//                    name = "Café Espresso",
-//                    description = "Un café intenso y aromático para empezar el día.",
-//                    price = 3.50,
-//                    includesDrink = true,
-//                    imageUrl = "https://picsum.photos/id/237/80/80" // Usar picsum.photos para preview
-//                ),
-//                quantity = 2
-//            ),
-//            onQuantityChange = { _, _ -> },
-//            onRemoveItem = {}
-//        )
-//    }
-//}
-
-//// --- ViewModel Mocks para Previews (Para que los previews funcionen sin Hilt) ---
-//// Estas clases NO deben ir en tu código de producción, solo para previews.
-//// Podrías tener un archivo separado para tus PreviewProviders si lo deseas.
-//
-//class MockCartRepository : CartRepository {
-//    private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
-//
-//    override suspend fun addProduct(product: Product) {
-//        val currentItems = _cartItems.value.toMutableList()
-//        val existingItem = currentItems.find { it.product.id == product.id }
-//        if (existingItem != null) {
-//            existingItem.quantity++
-//        } else {
-//            currentItems.add(CartItem(product, 1))
-//        }
-//        _cartItems.value = currentItems
-//    }
-//
-//    override suspend fun updateCartItemQuantity(productId: String, quantity: Int) {
-//        _cartItems.update { currentItems ->
-//            currentItems.mapNotNull { item ->
-//                if (item.product.id == productId) {
-//                    if (quantity > 0) item.copy(quantity = quantity) else null
-//                } else item
-//            }
-//        }
-//    }
-//
-//    override suspend fun removeCartItem(productId: String) {
-//        _cartItems.update { currentItems ->
-//            currentItems.filter { it.product.id != productId }
-//        }
-//    }
-//
-//    override fun getCartItems(): Flow<List<CartItem>> = _cartItems.asStateFlow()
-//
-//    override suspend fun clearCart() {
-//        _cartItems.value = emptyList()
-//    }
-//}
-//
-//// Mock de OrderRepository para Previews
-//class MockOrderRepository : OrderRepository {
-//    private val _orders = MutableStateFlow<List<DomainOrder>>(emptyList())
-//    override suspend fun saveOrder(order: DomainOrder) {
-//        _orders.update { it + order.copy(id = (it.size + 1).toLong()) }
-//    }
-//
-//    override fun getAllOrders(): Flow<List<DomainOrder>> = _orders.asStateFlow()
-//}
-//
-//// Mock de Casos de Uso para Previews
-//class MockGetCartItemsUseCase(private val cartRepository: CartRepository) : GetCartItemsUseCase(cartRepository)
-//class MockUpdateCartItemQuantityUseCase(private val cartRepository: CartRepository) : UpdateCartItemQuantityUseCase(cartRepository)
-//class MockRemoveCartItemUseCase(private val cartRepository: CartRepository) : RemoveCartItemUseCase(cartRepository)
-//class MockClearCartUseCase(private val cartRepository: CartRepository) : ClearCartUseCase(cartRepository)
-//class MockCheckoutCartUseCase(private val cartRepository: CartRepository, private val orderRepository: OrderRepository) : CheckoutCartUseCase(cartRepository, orderRepository)
-//class MockAddToCartUseCase(private val cartRepository: CartRepository) : AddToCartUseCase(cartRepository)
-//
-//// Funciones de ayuda para los ViewModels de Preview
-//@Composable
-//fun previewCartViewModelEmpty(): CartViewModel {
-//    val mockCartRepo = remember { MockCartRepository() }
-//    val mockOrderRepo = remember { MockOrderRepository() }
-//    return remember {
-//        CartViewModel(
-//            getCartItemsUseCase = MockGetCartItemsUseCase(mockCartRepo),
-//            updateCartItemQuantityUseCase = MockUpdateCartItemQuantityUseCase(mockCartRepo),
-//            removeCartItemUseCase = MockRemoveCartItemUseCase(mockCartRepo),
-//            clearCartUseCase = MockClearCartUseCase(mockCartRepo),
-//            checkoutCartUseCase = MockCheckoutCartUseCase(mockCartRepo, mockOrderRepo),
-//            addToCartUseCase = MockAddToCartUseCase(mockCartRepo)
-//        )
-//    }
-//}
-//
-//@Composable
-//fun previewCartViewModelWithItems(): CartViewModel {
-//    val mockCartRepo = remember { MockCartRepository() }
-//    val mockOrderRepo = remember { MockOrderRepository() }
-//    val viewModel = remember {
-//        CartViewModel(
-//            getCartItemsUseCase = MockGetCartItemsUseCase(mockCartRepo),
-//            updateCartItemQuantityUseCase = MockUpdateCartItemQuantityUseCase(mockCartRepo),
-//            removeCartItemUseCase = MockRemoveCartItemUseCase(mockCartRepo),
-//            clearCartUseCase = MockClearCartUseCase(mockCartRepo),
-//            checkoutCartUseCase = MockCheckoutCartUseCase(mockCartRepo, mockOrderRepo),
-//            addToCartUseCase = MockAddToCartUseCase(mockCartRepo)
-//        )
-//    }
-//    // Añadir algunos ítems al carrito mock para el preview
-//    LaunchedEffect(Unit) {
-//        mockCartRepo.addProduct(Product("P001", "Café Espresso", "Descripción", 3.50, true, "https://picsum.photos/id/237/80/80"))
-//        mockCartRepo.addProduct(Product("P002", "Té Verde", "Descripción", 2.00, false, "https://picsum.photos/id/238/80/80"))
-//        mockCartRepo.updateCartItemQuantity("P002", 3) // Aumentar cantidad del té
-//    }
-//    return viewModel
-//}

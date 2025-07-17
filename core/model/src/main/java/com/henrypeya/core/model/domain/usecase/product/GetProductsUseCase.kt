@@ -2,6 +2,7 @@ package com.henrypeya.core.model.domain.usecase.product
 
 import com.henrypeya.core.model.domain.model.product.Product
 import com.henrypeya.core.model.domain.repository.product.ProductRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /**
@@ -11,7 +12,7 @@ class GetProductsUseCase @Inject constructor(
     private val productRepository: ProductRepository
 ) {
 
-    suspend operator fun invoke(): List<Product> {
+    operator fun invoke(): Flow<List<Product>> {
         return productRepository.getProducts()
     }
 

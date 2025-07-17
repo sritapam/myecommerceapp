@@ -9,9 +9,12 @@ import com.henrypeya.feature_product_list.ui.state.ProductListState
 import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
 import com.henrypeya.library.utils.StringUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -29,13 +32,15 @@ class ProductListViewModel @Inject constructor(
 
     private val _allProducts = MutableStateFlow<List<Product>>(emptyList())
 
+    private val _eventFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val eventFlow = _eventFlow.asSharedFlow()
+
     init {
         loadProducts()
-
-        extractCorroutines()
+        setupProductFilteringAndSorting()
     }
 
-    private fun extractCorroutines() {
+    private fun setupProductFilteringAndSorting() {
         viewModelScope.launch {
             combine(
                 _allProducts,
@@ -71,17 +76,23 @@ class ProductListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val products = getProductsUseCase()
-                _allProducts.value = products
-                _uiState.update { it.copy(
-                    products = products,
-                    isLoading = false
-                ) }
+                getProductsUseCase().collectLatest { products ->
+                    _allProducts.value = products
+                    _uiState.update {
+                        it.copy(
+                            filteredProducts = products,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                }
             } catch (e: Exception) {
-                _uiState.update { it.copy(
-                    errorMessage = "Error al cargar productos: ${e.localizedMessage ?: "Desconocido"}",
-                    isLoading = false
-                ) }
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Error al cargar productos: ${e.localizedMessage ?: "Desconocido"}",
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -98,9 +109,9 @@ class ProductListViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 addToCartUseCase(product)
-                _uiState.update { it.copy(errorMessage = "Producto '${product.name}' añadido al carrito.") }
+                _eventFlow.emit("Producto '${product.name}' añadido al carrito.")
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Error al añadir '${product.name}' al carrito: ${e.localizedMessage ?: "Desconocido"}") }
+                _eventFlow.emit("Error al añadir '${product.name}' al carrito: ${e.localizedMessage ?: "Desconocido"}")
             }
         }
     }

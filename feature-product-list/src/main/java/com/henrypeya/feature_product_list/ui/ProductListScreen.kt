@@ -43,16 +43,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.henrypeya.core.model.domain.model.product.Product
-import com.henrypeya.core.ui.MyEcommerceAppTheme
 import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,6 +62,17 @@ fun ProductListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { message ->
+            scope.launch {
+                snackBarHostState.showSnackbar(
+                    message = message,
+                    withDismissAction = true
+                )
+            }
+        }
+    }
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
@@ -249,32 +258,5 @@ fun SortOrderSelector(
                 )
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun ProductListScreenPreview() {
-    MyEcommerceAppTheme {
-        ProductListScreen(navController = rememberNavController())
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProductItemPreview() {
-    MyEcommerceAppTheme {
-        ProductItem(
-            product = Product(
-                "P001",
-                "Café Espresso",
-                "Un café intenso y aromático para empezar el día.",
-                3.50,
-                true,
-                "https://placehold.co/120x120/E0E0E0/000000?text=Cafe"
-            ),
-            onAddToCartClick = {}
-        )
     }
 }

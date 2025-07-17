@@ -1,10 +1,6 @@
 package com.henrypeya.data.local.entities
 
-/**
- * Represents a product entity for local storage.
- * Used to store and retrieve product information efficiently.
- */
-data class ProductForRoom(
+data class OrderItemEntity(
     val productId: String,
     val name: String,
     val price: Double,

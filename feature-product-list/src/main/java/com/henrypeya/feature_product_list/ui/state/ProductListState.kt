@@ -9,7 +9,6 @@ import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
  * search query, selected category, sort order, loading state, and any error messages.
  */
 data class ProductListState(
-    val products: List<Product> = emptyList(),
     val filteredProducts: List<Product> = emptyList(),
     val searchQuery: String = "",
     val sortOrder: ProductSortOrder = ProductSortOrder.NONE,
