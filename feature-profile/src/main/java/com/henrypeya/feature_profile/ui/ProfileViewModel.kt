@@ -1,6 +1,5 @@
 package com.henrypeya.feature_profile.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.model.user.User
@@ -25,18 +24,17 @@ open class ProfileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(
         ProfileUiState(
             user = User(
-                id = "temp",
-                name = "",
-                surname = "",
-                email = "",
-                nationality = ""
+                id = "loading",
+                fullName = "Cargando...",
+                email = "cargando@ejemplo.com",
+                nationality = "Desconocida",
+                imageUrl = null
             )
         )
     )
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
-    private val _editableName = MutableStateFlow("")
-    private val _editableSurname = MutableStateFlow("")
+    private val _editableFullName = MutableStateFlow("")
     private val _editableEmail = MutableStateFlow("")
     private val _editableNationality = MutableStateFlow("")
 
@@ -44,20 +42,15 @@ open class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getUserProfile().collectLatest { user ->
                 _uiState.update { it.copy(user = user) }
-                _editableName.value = user.name
-                _editableSurname.value = user.surname
+                _editableFullName.value = user.fullName
                 _editableEmail.value = user.email
                 _editableNationality.value = user.nationality
             }
         }
     }
 
-    fun onNameChange(newName: String) {
-        _editableName.value = newName
-    }
-
-    fun onSurnameChange(newSurname: String) {
-        _editableSurname.value = newSurname
+    fun onFullNameChange(newFullName: String) {
+        _editableFullName.value = newFullName
     }
 
     fun onEmailChange(newEmail: String) {
@@ -70,9 +63,9 @@ open class ProfileViewModel @Inject constructor(
 
     fun toggleEditMode() {
         _uiState.update { it.copy(isEditing = !it.isEditing) }
+
         if (!uiState.value.isEditing) {
-            _editableName.value = uiState.value.user.name
-            _editableSurname.value = uiState.value.user.surname
+            _editableFullName.value = uiState.value.user.fullName
             _editableEmail.value = uiState.value.user.email
             _editableNationality.value = uiState.value.user.nationality
         }
@@ -83,18 +76,23 @@ open class ProfileViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val updatedUser = uiState.value.user.copy(
-                    name = _editableName.value,
-                    surname = _editableSurname.value,
+                    fullName = _editableFullName.value,
                     email = _editableEmail.value,
                     nationality = _editableNationality.value
                 )
-                userRepository.updateUserProfile(updatedUser)
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isEditing = false,
-                        errorMessage = "Perfil actualizado exitosamente."
-                    )
+
+                userRepository.updateUserProfile(updatedUser).collectLatest { persistedUser ->
+                    _uiState.update {
+                        it.copy(
+                            user = persistedUser,
+                            isLoading = false,
+                            isEditing = false,
+                            errorMessage = "Perfil actualizado exitosamente."
+                        )
+                    }
+                    _editableFullName.value = persistedUser.fullName
+                    _editableEmail.value = persistedUser.email
+                    _editableNationality.value = persistedUser.nationality
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -112,16 +110,10 @@ open class ProfileViewModel @Inject constructor(
             _uiState.update { it.copy(showImageUploadProgress = true, errorMessage = null) }
             try {
                 val imageUrl = userRepository.uploadProfileImage(imageData)
+
                 _uiState.update { currentState ->
                     currentState.copy(
                         user = currentState.user.copy(imageUrl = imageUrl),
-                        showImageUploadProgress = false,
-                        errorMessage = "Imagen subida exitosamente."
-                    )
-                }
-
-                _uiState.update {
-                    it.copy(
                         showImageUploadProgress = false,
                         errorMessage = "Imagen subida exitosamente."
                     )
@@ -142,6 +134,10 @@ open class ProfileViewModel @Inject constructor(
             try {
                 authRepository.logout()
                 _uiState.update { it.copy(errorMessage = "Sesión cerrada exitosamente.") }
+                _uiState.value = ProfileUiState(
+                    user = User(id = "logged_out", fullName = "Invitado", email = "", nationality = "", imageUrl = null),
+                    isEditing = false, isLoading = false, errorMessage = null, showImageUploadProgress = false
+                )
             } catch (e: Exception) {
                 _uiState.update { it.copy(errorMessage = "Error al cerrar sesión: ${e.localizedMessage ?: "Desconocido"}") }
             }
@@ -152,8 +148,7 @@ open class ProfileViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    val editableName: StateFlow<String> = _editableName.asStateFlow()
-    val editableSurname: StateFlow<String> = _editableSurname.asStateFlow()
+    val editableFullName: StateFlow<String> = _editableFullName.asStateFlow()
     val editableEmail: StateFlow<String> = _editableEmail.asStateFlow()
     val editableNationality: StateFlow<String> = _editableNationality.asStateFlow()
 }

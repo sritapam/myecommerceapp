@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -28,7 +27,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -54,7 +52,6 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.henrypeya.core.model.domain.model.product.Product
 import com.henrypeya.core.ui.MyEcommerceAppTheme
-import com.henrypeya.feature_product_list.ui.utils.ProductCategory
 import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
 import kotlinx.coroutines.launch
 
@@ -65,13 +62,13 @@ fun ProductListScreen(
     viewModel: ProductListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
             scope.launch {
-                snackbarHostState.showSnackbar(
+                snackBarHostState.showSnackbar(
                     message = message,
                     withDismissAction = true
                 )
@@ -86,7 +83,7 @@ fun ProductListScreen(
                 title = { Text("Catálogo de Productos") },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -113,10 +110,6 @@ fun ProductListScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                CategoryFilter(
-                    selectedCategory = uiState.selectedCategory,
-                    onCategorySelected = viewModel::onCategorySelected
-                )
 
                 SortOrderSelector(
                     selectedSortOrder = uiState.sortOrder,
@@ -138,9 +131,9 @@ fun ProductListScreen(
                     text = "No se encontraron productos para '${uiState.searchQuery}'",
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-            } else if (uiState.filteredProducts.isEmpty() && uiState.searchQuery.isBlank() && uiState.selectedCategory != ProductCategory.ALL) {
+            } else if (uiState.filteredProducts.isEmpty()) {
                 Text(
-                    text = "No se encontraron productos en la categoría '${uiState.selectedCategory.displayName}'",
+                    text = "No hay productos disponibles",
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             } else {
@@ -205,7 +198,7 @@ fun ProductItem(product: Product, onAddToCartClick: (Product) -> Unit) {
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
-                if (product.includesDrink) {
+                if (product.hasDrink) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.Star,
@@ -225,37 +218,6 @@ fun ProductItem(product: Product, onAddToCartClick: (Product) -> Unit) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = "Agregar al carrito")
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Agregar al Carrito")
-            }
-        }
-    }
-}
-
-@Composable
-fun CategoryFilter(
-    selectedCategory: ProductCategory,
-    onCategorySelected: (ProductCategory) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box {
-        Button(onClick = { expanded = true }) {
-            Icon(Icons.Default.FilterList, contentDescription = "Filtrar por categoría")
-            Spacer(Modifier.width(8.dp))
-            Text(selectedCategory.displayName)
-            Icon(Icons.Default.ArrowDropDown, contentDescription = "Expandir menú")
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            ProductCategory.values().forEach { category ->
-                DropdownMenuItem(
-                    text = { Text(category.displayName) },
-                    onClick = {
-                        onCategorySelected(category)
-                        expanded = false
-                    }
-                )
             }
         }
     }

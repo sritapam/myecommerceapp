@@ -12,7 +12,7 @@ import com.henrypeya.data.local.entities.OrderEntity
 import com.henrypeya.data.local.entities.UserEntity
 
 @Database(entities = [CartItemEntity::class, OrderEntity::class, UserEntity::class],
-    version = 3, exportSchema = true)
+    version = 5, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

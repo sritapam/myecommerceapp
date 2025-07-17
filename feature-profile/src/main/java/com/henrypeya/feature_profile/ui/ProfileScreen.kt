@@ -38,8 +38,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val editableName by viewModel.editableName.collectAsStateWithLifecycle()
-    val editableSurname by viewModel.editableSurname.collectAsStateWithLifecycle()
+    val editableName by viewModel.editableFullName.collectAsStateWithLifecycle()
     val editableEmail by viewModel.editableEmail.collectAsStateWithLifecycle()
     val editableNationality by viewModel.editableNationality.collectAsStateWithLifecycle()
 
@@ -243,16 +242,9 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             ProfileTextField(
-                label = "Nombre",
+                label = "Nombre y Apellido",
                 value = editableName,
-                onValueChange = viewModel::onNameChange,
-                isEnabled = uiState.isEditing
-            )
-
-            ProfileTextField(
-                label = "Apellido",
-                value = editableSurname,
-                onValueChange = viewModel::onSurnameChange,
+                onValueChange = viewModel::onFullNameChange,
                 isEnabled = uiState.isEditing
             )
 

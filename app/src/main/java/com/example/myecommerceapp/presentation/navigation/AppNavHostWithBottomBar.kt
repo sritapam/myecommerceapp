@@ -65,7 +65,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
         if (isLoggedIn) {
             if (navController.currentDestination?.route != "main_app_graph") {
                 navController.navigate("main_app_graph") {
-                    Log.d("AppNavHost", "Login state changed to true, navigating to main_app_graph")
                     popUpTo(navController.graph.id) {
                         inclusive = true
                     }
@@ -74,7 +73,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
             }
         } else {
             if (navController.currentDestination?.route != "login_route") {
-                Log.d("AppNavHost", "Login state changed to false, navigating to login_route")
                 navController.navigate("login_route") {
                     popUpTo(navController.graph.id) {
                         inclusive = true

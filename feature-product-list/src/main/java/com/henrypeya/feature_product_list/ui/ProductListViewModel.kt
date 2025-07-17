@@ -6,7 +6,6 @@ import com.henrypeya.core.model.domain.usecase.product.GetProductsUseCase
 import com.henrypeya.core.model.domain.model.product.Product
 import com.henrypeya.core.model.domain.usecase.cart.AddToCartUseCase
 import com.henrypeya.feature_product_list.ui.state.ProductListState
-import com.henrypeya.feature_product_list.ui.utils.ProductCategory
 import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
 import com.henrypeya.library.utils.StringUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,9 +40,8 @@ class ProductListViewModel @Inject constructor(
             combine(
                 _allProducts,
                 _uiState.map { it.searchQuery },
-                _uiState.map { it.selectedCategory },
                 _uiState.map { it.sortOrder }
-            ) { allProducts, searchQuery, selectedCategory, sortOrder ->
+            ) { allProducts, searchQuery, sortOrder ->
 
                 val normalizedSearchQuery = StringUtils.normalizeAccentsAndLowercase(searchQuery)
 
@@ -58,39 +56,10 @@ class ProductListViewModel @Inject constructor(
                     }
                 }
 
-                val categoryFiltered = if (selectedCategory == ProductCategory.ALL) {
-                    searchFiltered
-                } else {
-                    searchFiltered.filter { product ->
-                        val normalizedProductName =
-                            StringUtils.normalizeAccentsAndLowercase(product.name)
-
-                        when (selectedCategory) {
-                            ProductCategory.COFFEE -> normalizedProductName.contains("cafe") || normalizedProductName.contains(
-                                "espresso"
-                            )
-
-                            ProductCategory.SNACKS -> normalizedProductName.contains("galletas") || normalizedProductName.contains(
-                                "brownie"
-                            ) || normalizedProductName.contains("muffin")
-
-                            ProductCategory.DRINKS -> normalizedProductName.contains("jugo") || normalizedProductName.contains(
-                                "smoothie"
-                            ) || normalizedProductName.contains("te")
-
-                            ProductCategory.BAKERY -> normalizedProductName.contains("muffin") || normalizedProductName.contains(
-                                "brownie"
-                            )
-
-                            else -> true
-                        }
-                    }
-                }
-
                 when (sortOrder) {
-                    ProductSortOrder.PRICE_ASC -> categoryFiltered.sortedBy { it.price }
-                    ProductSortOrder.PRICE_DESC -> categoryFiltered.sortedByDescending { it.price }
-                    else -> categoryFiltered
+                    ProductSortOrder.PRICE_ASC -> searchFiltered.sortedBy { it.price }
+                    ProductSortOrder.PRICE_DESC -> searchFiltered.sortedByDescending { it.price }
+                    else -> searchFiltered
                 }
             }.collect { filteredList ->
                 _uiState.update { it.copy(filteredProducts = filteredList) }
@@ -119,10 +88,6 @@ class ProductListViewModel @Inject constructor(
 
     fun onSearchQueryChange(newQuery: String) {
         _uiState.update { it.copy(searchQuery = newQuery) }
-    }
-
-    fun onCategorySelected(category: ProductCategory) {
-        _uiState.update { it.copy(selectedCategory = category) }
     }
 
     fun onSortOrderSelected(order: ProductSortOrder) {

@@ -9,4 +9,6 @@ import kotlinx.coroutines.flow.Flow
 interface OrderRepository {
     suspend fun saveOrder(order: Order)
     fun getAllOrders(): Flow<List<Order>>
+    suspend fun getUnSyncedOrders(): List<Order>
+    suspend fun syncOrder(order: Order): Boolean
 }

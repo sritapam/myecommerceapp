@@ -8,7 +8,7 @@ import com.henrypeya.core.model.domain.repository.user.UserRepository
 import com.henrypeya.data.repository.auth.AuthRepositoryImpl
 import com.henrypeya.data.repository.cart.CartRepositoryImpl
 import com.henrypeya.data.repository.order.OrderRepositoryImpl
-import com.henrypeya.data.repository.product.FakeProductRepositoryImpl
+import com.henrypeya.data.repository.product.ProductRepositoryImpl
 import com.henrypeya.data.repository.user.UserRepositoryImpl
 import com.henrypeya.data.service.imageupload.CloudinaryService
 import com.henrypeya.data.service.imageupload.CloudinaryServiceImpl
@@ -16,11 +16,13 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AppModule {
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Binds
     @Singleton
     abstract fun bindAuthRepository(
@@ -30,7 +32,7 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindProductRepository(
-        fakeProductRepository: FakeProductRepositoryImpl
+        fakeProductRepository: ProductRepositoryImpl
     ): ProductRepository
 
     @Binds

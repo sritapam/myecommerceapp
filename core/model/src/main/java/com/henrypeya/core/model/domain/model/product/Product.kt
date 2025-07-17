@@ -5,6 +5,6 @@ data class Product(
     val name: String,
     val description: String,
     val price: Double,
-    val includesDrink: Boolean,
+    val hasDrink: Boolean,
     val imageUrl: String? = null
 )

@@ -8,7 +8,9 @@ import java.util.Date
 data class OrderEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val orderIdApi: String? = null,
     val date: Date,
     val total: Double,
-    val productsJson: String
+    val productsJson: String,
+    val isSynced: Boolean = false
 )

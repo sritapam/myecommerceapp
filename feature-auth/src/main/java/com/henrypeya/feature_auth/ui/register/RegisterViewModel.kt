@@ -147,7 +147,7 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
         _registerState.value = RegisterState.Loading
         viewModelScope.launch {
             try {
-                val success = authRepository.register(email.value, password.value)
+                val success = authRepository.register(email.value, fullName.value, password.value)
 
                 if (success) {
                     _registerState.value = RegisterState.Success

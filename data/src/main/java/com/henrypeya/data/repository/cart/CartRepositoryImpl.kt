@@ -71,7 +71,7 @@ fun CartItemEntity.toDomain(): CartItem {
             name = this.name,
             description = "N/A",
             price = this.price,
-            includesDrink = false,
+            hasDrink = false,
             imageUrl = this.imageUrl
         ),
         quantity = this.quantity
