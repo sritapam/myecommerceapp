@@ -58,7 +58,8 @@ class ProductRepositoryImpl @Inject constructor(
             description = this.description,
             price = this.price,
             hasDrink = this.hasDrink,
-            imageUrl = this.imageUrl
+            imageUrl = this.imageUrl,
+            category = this.category
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.henrypeya.feature_product_list.ui.state
 
 import com.henrypeya.core.model.domain.model.product.Product
+import com.henrypeya.feature_product_list.ui.CategoryDisplayItem
 import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
 
 /**
@@ -13,5 +14,8 @@ data class ProductListState(
     val searchQuery: String = "",
     val sortOrder: ProductSortOrder = ProductSortOrder.NONE,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val selectedCategory: String? = null,
+    val filterHasDrink: Boolean = false,
+    val categories: List<CategoryDisplayItem> = emptyList()
 )

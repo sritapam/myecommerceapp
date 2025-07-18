@@ -12,5 +12,6 @@ data class OrderEntity(
     val date: Date,
     val total: Double,
     val productsJson: String,
-    val isSynced: Boolean = false
+    val isSynced: Boolean = false,
+    val category: String?
 )

@@ -32,7 +32,8 @@ class CartRepositoryImpl @Inject constructor(
                 name = product.name,
                 price = product.price,
                 imageUrl = product.imageUrl,
-                quantity = INITIAL_QUANTITY
+                quantity = INITIAL_QUANTITY,
+                category = product.category
             )
             cartDao.insertCartItem(newItemEntity)
         }
@@ -72,7 +73,9 @@ fun CartItemEntity.toDomain(): CartItem {
             description = "N/A",
             price = this.price,
             hasDrink = false,
-            imageUrl = this.imageUrl
+            imageUrl = this.imageUrl,
+            category = this.category
+
         ),
         quantity = this.quantity
     )
@@ -84,6 +87,7 @@ fun CartItem.toEntity(): CartItemEntity {
         name = this.product.name,
         price = this.product.price,
         imageUrl = this.product.imageUrl,
-        quantity = this.quantity
+        quantity = this.quantity,
+        category = this.product.category
     )
 }

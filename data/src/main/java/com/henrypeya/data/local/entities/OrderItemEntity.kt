@@ -5,5 +5,6 @@ data class OrderItemEntity(
     val name: String,
     val price: Double,
     val quantity: Int,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val category: String?
 )

@@ -8,5 +8,6 @@ data class FoodResponseDto(
     @SerializedName("description") val description: String,
     @SerializedName("imageUrl") val imageUrl: String,
     @SerializedName("price") val price: Double,
-    @SerializedName("hasDrink") val hasDrink: Boolean
+    @SerializedName("hasDrink") val hasDrink: Boolean,
+    @SerializedName("category") val category: String
 )

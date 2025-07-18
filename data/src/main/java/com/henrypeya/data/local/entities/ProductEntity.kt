@@ -10,5 +10,6 @@ data class ProductEntity(
     val description: String,
     val price: Double,
     val hasDrink: Boolean,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val category: String
 )

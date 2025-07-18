@@ -31,7 +31,9 @@ class CheckoutCartUseCase @Inject constructor(
             id = 0,
             date = Date(),
             total = total,
-            products = orderItems
+            products = orderItems,
+            isSynced = false,
+            category = orderItems.firstOrNull()?.product?.category ?: "Uncategorized"
         )
 
         orderRepository.saveOrder(newOrder)

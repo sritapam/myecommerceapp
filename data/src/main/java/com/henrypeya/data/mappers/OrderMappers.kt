@@ -19,7 +19,8 @@ fun DomainOrder.toEntity(): OrderEntity {
             name = domainOrderItem.product.name,
             price = domainOrderItem.product.price,
             quantity = domainOrderItem.quantity,
-            imageUrl = domainOrderItem.product.imageUrl
+            imageUrl = domainOrderItem.product.imageUrl,
+            category = domainOrderItem.product.category
         )
     }
     return OrderEntity(
@@ -28,7 +29,8 @@ fun DomainOrder.toEntity(): OrderEntity {
         date = this.date,
         total = this.total,
         productsJson = Converters().fromProductList(entityProducts) ?: "[]",
-        isSynced = this.isSynced
+        isSynced = this.isSynced,
+        category = this.category
     )
 }
 
@@ -42,7 +44,8 @@ fun OrderEntity.toDomain(): DomainOrder {
                 description = "N/A",
                 imageUrl = entityProduct.imageUrl ?: "",
                 price = entityProduct.price,
-                hasDrink = false
+                hasDrink = false,
+                category = entityProduct.category ?: "Uncategorized"
             ),
             quantity = entityProduct.quantity
         )
@@ -53,7 +56,8 @@ fun OrderEntity.toDomain(): DomainOrder {
         date = this.date,
         total = this.total,
         products = domainOrderItems,
-        isSynced = this.isSynced
+        isSynced = this.isSynced,
+        category = domainOrderItems.firstOrNull()?.product?.category ?: "Uncategorized"
     )
 }
 
@@ -65,7 +69,8 @@ fun DomainOrder.toRequestDto(): OrderRequestDto {
             imageUrl = domainOrderItem.product.imageUrl,
             price = domainOrderItem.product.price,
             hasDrink = domainOrderItem.product.hasDrink,
-            quantity = domainOrderItem.quantity
+            quantity = domainOrderItem.quantity,
+            category = domainOrderItem.product.category
         )
     }
 
@@ -92,7 +97,8 @@ fun OrderResponseDto.toDomain(): DomainOrder {
                 description = orderItemDto.description ?: "N/A",
                 imageUrl = orderItemDto.imageUrl,
                 price = orderItemDto.price,
-                hasDrink = orderItemDto.hasDrink
+                hasDrink = orderItemDto.hasDrink,
+                category = orderItemDto.category
             ),
             quantity = orderItemDto.quantity
         )
@@ -103,6 +109,7 @@ fun OrderResponseDto.toDomain(): DomainOrder {
         date = Date(this.timestamp),
         total = this.total,
         products = domainOrderItems,
-        isSynced = true
+        isSynced = true,
+        category = domainOrderItems.firstOrNull()?.product?.category ?: "Uncategorized"
     )
 }

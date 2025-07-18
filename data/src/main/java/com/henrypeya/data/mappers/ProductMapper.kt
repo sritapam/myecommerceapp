@@ -10,7 +10,8 @@ fun ProductEntity.toDomainProduct(): Product {
         description = this.description,
         price = this.price,
         hasDrink = this.hasDrink,
-        imageUrl = this.imageUrl
+        imageUrl = this.imageUrl,
+        category = this.category
     )
 }
 
@@ -21,6 +22,7 @@ fun Product.toEntityProduct(): ProductEntity {
         description = this.description,
         price = this.price,
         hasDrink = this.hasDrink,
-        imageUrl = this.imageUrl
+        imageUrl = this.imageUrl,
+        category = this.category
     )
 }

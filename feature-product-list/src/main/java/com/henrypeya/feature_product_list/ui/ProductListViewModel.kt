@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.usecase.product.GetProductsUseCase
 import com.henrypeya.core.model.domain.model.product.Product
 import com.henrypeya.core.model.domain.usecase.cart.AddToCartUseCase
+import com.henrypeya.feature_product_list.R
 import com.henrypeya.feature_product_list.ui.state.ProductListState
 import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
 import com.henrypeya.library.utils.StringUtils
@@ -38,6 +39,7 @@ class ProductListViewModel @Inject constructor(
     init {
         loadProducts()
         setupProductFilteringAndSorting()
+        loadCategoryDisplayItems()
     }
 
     private fun setupProductFilteringAndSorting() {
@@ -45,8 +47,10 @@ class ProductListViewModel @Inject constructor(
             combine(
                 _allProducts,
                 _uiState.map { it.searchQuery },
-                _uiState.map { it.sortOrder }
-            ) { allProducts, searchQuery, sortOrder ->
+                _uiState.map { it.sortOrder },
+                _uiState.map { it.selectedCategory },
+                _uiState.map { it.filterHasDrink }
+            ) { allProducts, searchQuery, sortOrder, selectedCategory, filterHasDrink ->
 
                 val normalizedSearchQuery = StringUtils.normalizeAccentsAndLowercase(searchQuery)
 
@@ -61,10 +65,26 @@ class ProductListViewModel @Inject constructor(
                     }
                 }
 
+                val categoryFiltered = if (selectedCategory.isNullOrBlank()) {
+                    searchFiltered
+                } else {
+                    searchFiltered.filter { product ->
+                        product.category == selectedCategory
+                    }
+                }
+
+                val hasDrinkFiltered = if (filterHasDrink) {
+                    categoryFiltered.filter { product ->
+                        product.hasDrink
+                    }
+                } else {
+                    categoryFiltered
+                }
+
                 when (sortOrder) {
-                    ProductSortOrder.PRICE_ASC -> searchFiltered.sortedBy { it.price }
-                    ProductSortOrder.PRICE_DESC -> searchFiltered.sortedByDescending { it.price }
-                    else -> searchFiltered
+                    ProductSortOrder.PRICE_ASC -> hasDrinkFiltered.sortedBy { it.price }
+                    ProductSortOrder.PRICE_DESC -> hasDrinkFiltered.sortedByDescending { it.price }
+                    ProductSortOrder.NONE -> hasDrinkFiltered
                 }
             }.collect { filteredList ->
                 _uiState.update { it.copy(filteredProducts = filteredList) }
@@ -97,6 +117,14 @@ class ProductListViewModel @Inject constructor(
         }
     }
 
+    fun onCategorySelected(category: String?) {
+        _uiState.update { it.copy(selectedCategory = category) }
+    }
+
+    fun onFilterHasDrinkToggled(isChecked: Boolean) {
+        _uiState.update { it.copy(filterHasDrink = isChecked) }
+    }
+
     fun onSearchQueryChange(newQuery: String) {
         _uiState.update { it.copy(searchQuery = newQuery) }
     }
@@ -118,5 +146,17 @@ class ProductListViewModel @Inject constructor(
 
     fun errorMessageShown() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    private fun loadCategoryDisplayItems() {
+        val displayItems = listOf(
+            CategoryDisplayItem("Mexicana", drawableResId = R.drawable.mexicanfood), // Asegúrate de que exista en res/drawable
+            CategoryDisplayItem("Comida Rápida", drawableResId = R.drawable.fastfood),
+            CategoryDisplayItem("Internacional", drawableResId = R.drawable.international),
+            CategoryDisplayItem("Saludable", drawableResId = R.drawable.healthy),
+            CategoryDisplayItem("Desayunos", drawableResId = R.drawable.breakfast),
+            CategoryDisplayItem("Platos Fuertes", drawableResId = R.drawable.dinner)
+        )
+        _uiState.update { it.copy(categories = displayItems) }
     }
 }

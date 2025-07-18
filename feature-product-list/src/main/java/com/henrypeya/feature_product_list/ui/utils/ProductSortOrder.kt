@@ -1,7 +1,7 @@
 package com.henrypeya.feature_product_list.ui.utils
 
 enum class ProductSortOrder(val displayName: String) {
-    NONE("Ninguno"),
-    PRICE_ASC("Precio Ascendente"),
-    PRICE_DESC("Precio Descendente")
+    NONE("Precio"),
+    PRICE_ASC("Menor a Mayor"),
+    PRICE_DESC("Mayor a Menor")
 }

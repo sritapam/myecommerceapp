@@ -8,5 +8,6 @@ data class Order(
     val date: Date,
     val total: Double,
     val products: List<OrderItem>,
-    val isSynced: Boolean = false
+    val isSynced: Boolean = false,
+    val category: String
 )

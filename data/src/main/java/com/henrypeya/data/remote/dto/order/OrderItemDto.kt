@@ -8,5 +8,6 @@ data class OrderItemDto(
     @SerializedName("imageUrl") val imageUrl: String?,
     @SerializedName("price") val price: Double,
     @SerializedName("hasDrink") val hasDrink: Boolean,
-    @SerializedName("quantity") val quantity: Int
+    @SerializedName("quantity") val quantity: Int,
+    @SerializedName("category") val category: String,
 )
