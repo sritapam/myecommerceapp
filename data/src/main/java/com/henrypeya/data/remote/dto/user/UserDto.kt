@@ -8,5 +8,5 @@ data class UserDto(
     @SerializedName("fullName") val fullName: String,
     @SerializedName("nationality") val nationality: String? = null,
     @SerializedName("imageUrl") val imageUrl: String? = null,
-    @SerializedName("encryptedPassword") val encryptedPassword: String,
+    @SerializedName("password") val password: String,
 )

@@ -2,6 +2,7 @@ package com.henrypeya.data.remote.di
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.henrypeya.data.BuildConfig
 import com.henrypeya.data.remote.api.ApiService
 import dagger.Module
 import dagger.Provides
@@ -20,7 +21,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-   val BASE_URL ="https://demopeyaappapi.onrender.com"
 
     @Provides
     @Singleton
@@ -64,7 +64,7 @@ object NetworkModule {
         gsonConverterFactory: GsonConverterFactory
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(gsonConverterFactory)
             .build()

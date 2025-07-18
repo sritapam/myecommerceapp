@@ -60,7 +60,7 @@ class AuthRepositoryImpl @Inject constructor(
 
         try {
             val response = apiService.loginUser(
-                LoginRequestDto(email = trimmedEmail, encryptedPassword = trimmedPassword)
+                LoginRequestDto(email = trimmedEmail, password = trimmedPassword)
             )
 
             if (response.message == "Login exitoso") {
@@ -109,7 +109,7 @@ class AuthRepositoryImpl @Inject constructor(
 
         try {
             val response = apiService.registerUser(
-                RegisterRequestDto(email = trimmedEmail, fullName = trimmedFullName, encryptedPassword = trimmedPassword)
+                RegisterRequestDto(email = trimmedEmail, fullName = trimmedFullName, password = trimmedPassword)
             )
 
             if (response.id.isNotEmpty()) {

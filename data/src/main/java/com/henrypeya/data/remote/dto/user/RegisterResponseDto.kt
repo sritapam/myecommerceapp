@@ -7,5 +7,5 @@ data class RegisterResponseDto(
     @SerializedName("email") val email: String,
     @SerializedName("fullName") val fullName: String,
     @SerializedName("userImageUrl") val userImageUrl: String? = null,
-    @SerializedName("encryptedPassword") val encryptedPassword: String
+    @SerializedName("password") val password: String
 )

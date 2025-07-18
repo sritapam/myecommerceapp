@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -14,6 +16,19 @@ android {
         minSdk = 27
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProperties = Properties().apply {
+            val file = rootProject.file("local.properties")
+            if (file.exists()) {
+                load(file.inputStream())
+            }
+        }
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            localProperties.getProperty("BASE_URL")
+        )
     }
 
     buildTypes {
