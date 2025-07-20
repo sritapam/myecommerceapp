@@ -1,22 +1,26 @@
 package com.henrypeya.feature_profile.ui
 
+import kotlinx.coroutines.launch
+import com.henrypeya.feature_profile.ui.state.ProfileUiState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.model.user.User
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import com.henrypeya.core.model.domain.repository.user.UserRepository
-import com.henrypeya.feature_profile.ui.state.ProfileUiState
+import com.henrypeya.feature_profile.ui.state.ProfileUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class ProfileViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -37,6 +41,13 @@ open class ProfileViewModel @Inject constructor(
     private val _editableFullName = MutableStateFlow("")
     private val _editableEmail = MutableStateFlow("")
     private val _editableNationality = MutableStateFlow("")
+
+    val editableFullName: StateFlow<String> = _editableFullName.asStateFlow()
+    val editableEmail: StateFlow<String> = _editableEmail.asStateFlow()
+    val editableNationality: StateFlow<String> = _editableNationality.asStateFlow()
+
+    private val _uiEvent = MutableSharedFlow<ProfileUiEvent>()
+    val uiEvent: SharedFlow<ProfileUiEvent> = _uiEvent.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -86,13 +97,13 @@ open class ProfileViewModel @Inject constructor(
                         it.copy(
                             user = persistedUser,
                             isLoading = false,
-                            isEditing = false,
-                            errorMessage = "Perfil actualizado exitosamente."
+                            isEditing = false
                         )
                     }
                     _editableFullName.value = persistedUser.fullName
                     _editableEmail.value = persistedUser.email
                     _editableNationality.value = persistedUser.nationality
+                    _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Perfil actualizado exitosamente."))
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -101,6 +112,7 @@ open class ProfileViewModel @Inject constructor(
                         isLoading = false
                     )
                 }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Error al guardar perfil: ${e.localizedMessage ?: "Desconocido"}"))
             }
         }
     }
@@ -114,10 +126,10 @@ open class ProfileViewModel @Inject constructor(
                 _uiState.update { currentState ->
                     currentState.copy(
                         user = currentState.user.copy(imageUrl = imageUrl),
-                        showImageUploadProgress = false,
-                        errorMessage = "Imagen subida exitosamente."
+                        showImageUploadProgress = false
                     )
                 }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Imagen subida exitosamente."))
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
@@ -125,6 +137,7 @@ open class ProfileViewModel @Inject constructor(
                         showImageUploadProgress = false
                     )
                 }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Error al subir imagen: ${e.localizedMessage ?: "Desconocido"}"))
             }
         }
     }
@@ -133,22 +146,27 @@ open class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authRepository.logout()
-                _uiState.update { it.copy(errorMessage = "Sesión cerrada exitosamente.") }
-                _uiState.value = ProfileUiState(
-                    user = User(id = "logged_out", fullName = "Invitado", email = "", nationality = "", imageUrl = null),
-                    isEditing = false, isLoading = false, errorMessage = null, showImageUploadProgress = false
-                )
+                _uiState.update {
+                    ProfileUiState(
+                        user = User(
+                            id = "logged_out",
+                            fullName = "Invitado",
+                            email = "",
+                            nationality = "",
+                            imageUrl = null
+                        ),
+                        isEditing = false,
+                        isLoading = false,
+                        showImageUploadProgress = false
+                    )
+                }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Sesión cerrada exitosamente."))
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Error al cerrar sesión: ${e.localizedMessage ?: "Desconocido"}") }
+                _uiState.update {
+                    it.copy(errorMessage = "Error al cerrar sesión: ${e.localizedMessage ?: "Desconocido"}")
+                }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Error al cerrar sesión: ${e.localizedMessage ?: "Desconocido"}"))
             }
         }
     }
-
-    fun errorMessageShown() {
-        _uiState.update { it.copy(errorMessage = null) }
-    }
-
-    val editableFullName: StateFlow<String> = _editableFullName.asStateFlow()
-    val editableEmail: StateFlow<String> = _editableEmail.asStateFlow()
-    val editableNationality: StateFlow<String> = _editableNationality.asStateFlow()
 }
