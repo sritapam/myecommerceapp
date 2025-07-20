@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_greeting">Hola, %1$s!</string>
+    <string name="profile_default_user">Usuario</string>
+    <string name="profile_loading_user">Cargando…</string>
+    <string name="profile_loading_email">cargando@ejemplo.com</string>
+    <string name="profile_unknown_nationality">Desconocida</string>
+    <string name="profile_guest_user">Invitado</string>
+
+    <string name="action_edit_profile">Editar Perfil</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_order_history">Historial de Pedidos</string>
+    <string name="action_logout">Cerrar Sesión</string>
+    <string name="action_camera">Cámara</string>
+    <string name="action_gallery">Galería</string>
+    <string name="action_accept">Aceptar</string>
+
+    <string name="label_full_name">Nombre y Apellido</string>
+    <string name="label_email">Email</string>
+    <string name="label_nationality">Nacionalidad</string>
+
+    <string name="permission_dialog_title">Permiso de %1$s</string>
+    <string name="permission_camera_rationale">Necesitamos acceso a tu cámara para tomar una foto de perfil.</string>
+    <string name="permission_gallery_rationale">Necesitamos acceso a tu galería para seleccionar una imagen de perfil.</string>
+    <string name="permission_denied_permanently">Permiso denegado permanentemente. Habilítalo desde Ajustes.</string>
+    <string name="permission_denied">Permiso denegado.</string>
+
+    <string name="message_no_image_captured">No se capturó ninguna imagen.</string>
+    <string name="message_no_image_selected">No se seleccionó ninguna imagen.</string>
+    <string name="message_profile_updated_success">Perfil actualizado exitosamente.</string>
+    <string name="message_profile_update_error">Error al guardar perfil: %1$s</string>
+    <string name="message_image_upload_success">Imagen subida exitosamente.</string>
+    <string name="message_image_upload_error">Error al subir imagen: %1$s</string>
+    <string name="message_logout_success">Sesión cerrada exitosamente.</string>
+    <string name="message_logout_error">Error al cerrar sesión: %1$s</string>
+
+    <string name="content_desc_profile_picture">Foto de perfil</string>
+    <string name="content_desc_edit_icon">Icono de editar</string>
+    <string name="content_desc_order_history_icon">Icono de historial de pedidos</string>
+    <string name="content_desc_camera_icon">Icono de cámara</string>
+    <string name="content_desc_gallery_icon">Icono de galería</string>
+
+</resources>

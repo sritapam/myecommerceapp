@@ -13,8 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import coil.compose.SubcomposeAsyncImage
+import com.henrypeya.feature_profile.R
 import com.henrypeya.feature_profile.ui.state.ProfileUiState
 
 @Composable
@@ -27,7 +29,7 @@ fun ProfileHeader(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(120.dp)
+                .size(dimensionResource(id = R.dimen.profile_image_size))
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
@@ -35,35 +37,45 @@ fun ProfileHeader(
             if (!uiState.user.imageUrl.isNullOrEmpty()) {
                 SubcomposeAsyncImage(
                     model = uiState.user.imageUrl,
-                    contentDescription = "Foto de perfil",
+                    contentDescription = stringResource(id = R.string.content_desc_profile_picture),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     loading = { CircularProgressIndicator() },
                     error = {
-                        Icon(Icons.Filled.CameraAlt, null, Modifier.size(60.dp), tint = Color.Gray)
+                        Icon(
+                            Icons.Filled.CameraAlt,
+                            contentDescription = null,
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.profile_image_icon_size)),
+                            tint = Color.Gray
+                        )
                     }
                 )
             } else {
-                Icon(Icons.Filled.CameraAlt, null, Modifier.size(60.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                Icon(
+                    Icons.Filled.CameraAlt,
+                    contentDescription = null,
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.profile_image_icon_size)),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
 
             if (uiState.showImageUploadProgress) {
-                CircularProgressIndicator(modifier = Modifier.size(50.dp))
+                CircularProgressIndicator(modifier = Modifier.size(dimensionResource(id = R.dimen.profile_image_progress_size)))
             }
         }
 
         if (isEditing) {
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Spacer(Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
+            Row(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small))) {
                 Button(onClick = onCameraClick) {
-                    Icon(Icons.Filled.CameraAlt, null)
-                    Spacer(Modifier.width(4.dp))
-                    Text("Cámara")
+                    Icon(Icons.Filled.CameraAlt, contentDescription = stringResource(id = R.string.content_desc_camera_icon))
+                    Spacer(Modifier.width(dimensionResource(id = R.dimen.spacing_extra_small)))
+                    Text(stringResource(id = R.string.action_camera))
                 }
                 Button(onClick = onGalleryClick) {
-                    Icon(Icons.Filled.Photo, null)
-                    Spacer(Modifier.width(4.dp))
-                    Text("Galería")
+                    Icon(Icons.Filled.Photo, contentDescription = stringResource(id = R.string.content_desc_gallery_icon))
+                    Spacer(Modifier.width(dimensionResource(id = R.dimen.spacing_extra_small)))
+                    Text(stringResource(id = R.string.action_gallery))
                 }
             }
         }

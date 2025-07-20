@@ -4,5 +4,5 @@ import androidx.annotation.StringRes
 
 /** Provides string resources by their resource ID. */
 interface ResourceProvider {
-    fun getString(@StringRes stringResId: Int): String
+    fun getString(@StringRes stringResId: Int, vararg formatArgs: Any): String
 }

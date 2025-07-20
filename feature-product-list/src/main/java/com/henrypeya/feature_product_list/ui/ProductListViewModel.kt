@@ -36,7 +36,7 @@ class ProductListViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val eventFlow = _eventFlow.asSharedFlow()
 
-    init {
+    fun loadInitialData() {
         loadProducts()
         setupProductFilteringAndSorting()
         loadCategoryDisplayItems()

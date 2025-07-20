@@ -1,4 +1,4 @@
-package com.henrypeya.feature_product_list.ui
+package com.henrypeya.feature_product_list.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -32,11 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.henrypeya.feature_product_list.R
+import com.henrypeya.feature_product_list.ui.CategoryDisplayItem
 
 @Composable
 fun CategorySelectorRow(
@@ -47,8 +50,8 @@ fun CategorySelectorRow(
 ) {
     LazyRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 4.dp)
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_8)),
+        contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_4))
     ) {
         items(categories) { item ->
             CategoryCard(
@@ -77,7 +80,7 @@ fun CategoryCard(
 
     Column(
         modifier = modifier
-            .width(100.dp)
+            .width(dimensionResource(id = R.dimen.category_card_width))
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -87,13 +90,13 @@ fun CategoryCard(
     ) {
         Box(
             modifier = Modifier
-                .size(90.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .size(dimensionResource(id = R.dimen.category_box_size))
+                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius_12)))
         ) {
             Card(
                 modifier = Modifier.fillMaxSize(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation_2)),
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius_12)),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
@@ -120,14 +123,14 @@ fun CategoryCard(
                         icon != null -> Icon(
                             imageVector = icon,
                             contentDescription = categoryName,
-                            modifier = Modifier.size(60.dp),
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_60)),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         else -> Icon(
                             imageVector = Icons.Default.BrokenImage,
-                            contentDescription = "No hay imagen",
-                            modifier = Modifier.size(48.dp),
+                            contentDescription = stringResource(id = R.string.no_image_description),
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_48)),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -139,12 +142,12 @@ fun CategoryCard(
                     modifier = Modifier
                         .matchParentSize()
                         .background(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius_12)))
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_6)))
 
         Text(
             text = categoryName,

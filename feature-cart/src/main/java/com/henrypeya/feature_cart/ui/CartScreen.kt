@@ -1,9 +1,11 @@
 package com.henrypeya.feature_cart.ui
 
+import com.henrypeya.feature_cart.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -13,8 +15,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -72,23 +75,23 @@ fun CartScreen(
                 title = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small))
                     ) {
                         Icon(
                             imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Carrito de Compras",
+                            contentDescription = stringResource(id = R.string.content_desc_cart_icon),
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium))
                         )
                         Text(
-                            "Tu Carrito",
+                            stringResource(id = R.string.cart_title),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
                         )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(id = R.string.content_desc_back_button))
                     }
                 },
                 actions = {
@@ -96,7 +99,7 @@ fun CartScreen(
                         IconButton(onClick = viewModel::onClearCart) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = "Vaciar carrito",
+                                contentDescription = stringResource(id = R.string.content_desc_clear_cart),
                             )
                         }
                     }
@@ -125,23 +128,23 @@ fun CartScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.Default.RemoveShoppingCart,
-                            contentDescription = "Carrito Vacío",
-                            modifier = Modifier.size(64.dp),
+                            contentDescription = stringResource(id = R.string.content_desc_empty_cart),
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_extra_large)),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
                         Text(
-                            "¡Tu carrito está vacío!",
+                            stringResource(id = R.string.cart_empty_title),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_small)))
                         Text(
-                            "Explora nuestros productos y añade tus favoritos.",
+                            stringResource(id = R.string.cart_empty_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
                         Button(onClick = {
                             navController.navigate("products") {
                                 popUpTo("main_app_graph") { inclusive = true }
@@ -149,15 +152,15 @@ fun CartScreen(
                                 restoreState = false
                             }
                         }) {
-                            Text("Ir a Productos")
+                            Text(stringResource(id = R.string.action_go_to_products))
                         }
                     }
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(dimensionResource(id = R.dimen.spacing_medium)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small))
                 ) {
                     items(uiState.cartItems, key = { it.product.id }) { cartItem ->
                         CartItemRow(
@@ -171,49 +174,47 @@ fun CartScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        .padding(dimensionResource(id = R.dimen.spacing_medium)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation_medium))
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_medium))) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Total:", style = MaterialTheme.typography.headlineSmall)
+                            Text(stringResource(id = R.string.label_total), style = MaterialTheme.typography.headlineSmall)
                             Text(
-                                "$${String.format("%.2f", uiState.totalPrice)}",
+                                stringResource(id = R.string.price_format_ars, uiState.totalPrice),
                                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
                         Button(
                             onClick = viewModel::onCheckout,
                             modifier = Modifier.fillMaxWidth(),
                             enabled = uiState.cartItems.isNotEmpty() && !uiState.isLoading
                         ) {
-                            Text("Proceder al Pago")
+                            Text(stringResource(id = R.string.action_checkout))
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_small)))
                         OutlinedButton(
                             onClick = {
                                 navController.navigate("products") {
-                                   launchSingleTop =
-                                        true
-                                    restoreState =
-                                        true
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.AddShoppingCart,
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                contentDescription = stringResource(id = R.string.content_desc_continue_shopping_icon),
+                                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small))
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Seguir Comprando")
+                            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_small)))
+                            Text(stringResource(id = R.string.action_continue_shopping))
                         }
                     }
                 }
@@ -221,4 +222,3 @@ fun CartScreen(
         }
     }
 }
-

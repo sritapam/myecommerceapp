@@ -1,4 +1,4 @@
-package com.henrypeya.feature_product_list.ui
+package com.henrypeya.feature_product_list.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +21,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import com.henrypeya.feature_product_list.R
 import com.henrypeya.feature_product_list.ui.utils.ProductSortOrder
 
 @Composable
@@ -38,9 +40,9 @@ fun PriceSortFilter(
             onClick = { expanded = true },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            shape = RoundedCornerShape(20.dp),
-            contentPadding = PaddingValues(horizontal = 8.dp),
+                .height(dimensionResource(id = R.dimen.height_48)),
+            shape = RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius_20)),
+            contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.padding_8)),
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isActive)
                     MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
@@ -56,8 +58,8 @@ fun PriceSortFilter(
             )
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = "Expandir opciones de precio",
-                modifier = Modifier.size(20.dp)
+                contentDescription = stringResource(id = R.string.expand_price_options),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_20))
             )
         }
 

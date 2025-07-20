@@ -15,5 +15,4 @@ class GetProductsUseCase @Inject constructor(
     operator fun invoke(): Flow<List<Product>> {
         return productRepository.getProducts()
     }
-
 }

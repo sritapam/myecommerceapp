@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="filter_with_drink">Con Bebida</string>
+    <string name="filter_active_with_drink">Filtro activo: Incluye bebida</string>
+    <string name="expand_price_options">Expandir opciones de precio</string>
+    <string name="includes_drink">Incluye bebida</string>
+    <string name="includes_drink_short">Incl. Bebida</string>
+    <string name="add_to_cart">Agregar al Carrito</string>
+    <string name="search_placeholder">Buscar plato...</string>
+    <string name="icon_search_description">Icono de Búsqueda</string>
+    <string name="icon_clear_description">Borrar texto</string>
+    <string name="content_desc_add_to_cart_icon">Icono de agregar al carrito</string>
+    <string name="no_image_description">No hay imagen</string>
+
+
+</resources>

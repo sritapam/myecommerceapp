@@ -13,19 +13,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
-import androidx.core.content.ContextCompat
+import com.henrypeya.feature_profile.R
 import com.henrypeya.feature_profile.ui.components.ProfileActions
 import com.henrypeya.feature_profile.ui.components.ProfileDetailsEditor
 import com.henrypeya.feature_profile.ui.components.ProfileHeader
 import com.henrypeya.feature_profile.ui.state.ProfileUiEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,14 +51,14 @@ fun ProfileScreen(
         ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
         bitmap?.let { viewModel.uploadProfileImage(it) }
-            ?: scope.launch { snackbarHostState.showSnackbar("No se capturó ninguna imagen.") }
+            ?: scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.message_no_image_captured)) }
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let { viewModel.uploadProfileImage(it) }
-            ?: scope.launch { snackbarHostState.showSnackbar("No se seleccionó ninguna imagen.") }
+            ?: scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.message_no_image_selected)) }
     }
 
     val requestCameraPermissionLauncher = rememberLauncherForActivityResult(
@@ -90,7 +92,10 @@ fun ProfileScreen(
         topBar = {
             TopAppBar(title = {
                 Text(
-                    "Hola, ${uiState.user.fullName.split(" ").firstOrNull() ?: "Usuario"}!",
+                    stringResource(
+                        id = R.string.profile_greeting,
+                        uiState.user.fullName.split(" ").firstOrNull() ?: stringResource(id = R.string.profile_default_user)
+                    ),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
             })
@@ -100,7 +105,7 @@ fun ProfileScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(dimensionResource(id = R.dimen.spacing_medium))
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -109,15 +114,10 @@ fun ProfileScreen(
                 onCameraClick = {
                     val perm = Manifest.permission.CAMERA
                     when {
-                        ContextCompat.checkSelfPermission(
-                            context,
-                            perm
-                        ) == PackageManager.PERMISSION_GRANTED ->
+                        ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED ->
                             cameraLauncher.launch(null)
-
                         shouldShowRequestPermissionRationale(context, perm) ->
                             showCameraPermissionDialog = true
-
                         else -> requestCameraPermissionLauncher.launch(perm)
                     }
                 },
@@ -125,22 +125,17 @@ fun ProfileScreen(
                     val perm = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                         Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
                     when {
-                        ContextCompat.checkSelfPermission(
-                            context,
-                            perm
-                        ) == PackageManager.PERMISSION_GRANTED ->
+                        ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED ->
                             galleryLauncher.launch("image/*")
-
                         shouldShowRequestPermissionRationale(context, perm) ->
                             showGalleryPermissionDialog = true
-
                         else -> requestGalleryPermissionLauncher.launch(perm)
                     }
                 },
                 isEditing = uiState.isEditing
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
 
             ProfileDetailsEditor(
                 editableName = editableName,
@@ -152,7 +147,7 @@ fun ProfileScreen(
                 isEditing = uiState.isEditing
             )
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(dimensionResource(id = R.dimen.spacing_extra_large)))
 
             ProfileActions(
                 isEditing = uiState.isEditing,
@@ -172,8 +167,8 @@ fun ProfileScreen(
                 showCameraPermissionDialog = false
                 requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             },
-            permissionName = "Cámara",
-            rationale = "Necesitamos acceso a tu cámara para tomar una foto de perfil."
+            permissionName = stringResource(id = R.string.action_camera),
+            rationale = stringResource(id = R.string.permission_camera_rationale)
         )
     }
 
@@ -186,8 +181,8 @@ fun ProfileScreen(
                     Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
                 requestGalleryPermissionLauncher.launch(permission)
             },
-            permissionName = "Galería",
-            rationale = "Necesitamos acceso a tu galería para seleccionar una imagen de perfil."
+            permissionName = stringResource(id = R.string.action_gallery),
+            rationale = stringResource(id = R.string.permission_gallery_rationale)
         )
     }
 }
@@ -201,16 +196,16 @@ fun PermissionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text("Permiso de $permissionName") },
+        title = { Text(stringResource(id = R.string.permission_dialog_title, permissionName)) },
         text = { Text(rationale) },
         confirmButton = {
             Button(onClick = onConfirm) {
-                Text("Aceptar")
+                Text(stringResource(id = R.string.action_accept))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text("Cancelar")
+                Text(stringResource(id = R.string.action_cancel))
             }
         }
     )
@@ -230,13 +225,13 @@ private fun handlePermissionDenied(
     if (!shouldShowRequestPermissionRationale(context, permission)) {
         scope.launch {
             snackbarHost.showSnackbar(
-                "Permiso denegado permanentemente. Habilítalo desde Ajustes.",
+                context.getString(R.string.permission_denied_permanently),
                 withDismissAction = true
             )
         }
     } else {
         scope.launch {
-            snackbarHost.showSnackbar("Permiso denegado.")
+            snackbarHost.showSnackbar(context.getString(R.string.permission_denied))
         }
     }
 }

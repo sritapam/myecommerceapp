@@ -19,7 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import com.henrypeya.feature_profile.R
 
 @Composable
 fun ProfileActions(
@@ -35,23 +37,23 @@ fun ProfileActions(
             onClick = onToggleEditMode,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(Icons.Filled.Edit, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text("Editar Perfil")
+            Icon(Icons.Filled.Edit, contentDescription = stringResource(id = R.string.content_desc_edit_icon))
+            Spacer(Modifier.width(dimensionResource(id = R.dimen.spacing_small)))
+            Text(stringResource(id = R.string.action_edit_profile))
         }
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
     }
 
     if (isEditing) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small))
         ) {
             OutlinedButton(
                 onClick = onToggleEditMode,
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Cancelar")
+                Text(stringResource(id = R.string.action_cancel))
             }
             Button(
                 onClick = onSaveProfile,
@@ -59,29 +61,29 @@ fun ProfileActions(
                 enabled = !isLoading
             ) {
                 if (isLoading) CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.progress_indicator_small_size)),
                     color = MaterialTheme.colorScheme.onPrimary
-                ) else Text("Guardar")
+                ) else Text(stringResource(id = R.string.action_save))
             }
         }
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
     }
 
     Button(
         onClick = onNavigateToOrderHistory,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Icon(Icons.AutoMirrored.Filled.List, contentDescription = null)
-        Spacer(Modifier.width(8.dp))
-        Text("Historial de Pedidos")
+        Icon(Icons.AutoMirrored.Filled.List, contentDescription = stringResource(id = R.string.content_desc_order_history_icon))
+        Spacer(Modifier.width(dimensionResource(id = R.dimen.spacing_small)))
+        Text(stringResource(id = R.string.action_order_history))
     }
 
-    Spacer(modifier = Modifier.height(20.dp))
+    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.profile_actions_spacer_height)))
 
     TextButton(
         onClick = onLogout,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text("Cerrar Sesión", color = MaterialTheme.colorScheme.error)
+        Text(stringResource(id = R.string.action_logout), color = MaterialTheme.colorScheme.error)
     }
 }

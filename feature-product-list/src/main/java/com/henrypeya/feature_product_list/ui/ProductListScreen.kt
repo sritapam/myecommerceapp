@@ -38,6 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.henrypeya.feature_product_list.ui.components.CategorySelectorRow
+import com.henrypeya.feature_product_list.ui.components.HasDrinkFilter
+import com.henrypeya.feature_product_list.ui.components.PriceSortFilter
+import com.henrypeya.feature_product_list.ui.components.ProductItem
+import com.henrypeya.feature_product_list.ui.components.SearchBar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -50,6 +55,10 @@ fun ProductListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialData()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.eventFlow.collectLatest { message ->

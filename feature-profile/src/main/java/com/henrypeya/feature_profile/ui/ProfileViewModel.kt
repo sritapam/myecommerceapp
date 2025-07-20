@@ -1,13 +1,16 @@
 package com.henrypeya.feature_profile.ui
 
-import kotlinx.coroutines.launch
-import com.henrypeya.feature_profile.ui.state.ProfileUiState
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.model.user.User
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import com.henrypeya.core.model.domain.repository.user.UserRepository
+import com.henrypeya.feature_profile.R
 import com.henrypeya.feature_profile.ui.state.ProfileUiEvent
+import com.henrypeya.feature_profile.ui.state.ProfileUiState
+import com.henrypeya.library.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,21 +20,23 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val resources: ResourceProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         ProfileUiState(
             user = User(
                 id = "loading",
-                fullName = "Cargando...",
-                email = "cargando@ejemplo.com",
-                nationality = "Desconocida",
+                fullName = resources.getString(R.string.profile_loading_user),
+                email = resources.getString(R.string.profile_loading_email),
+                nationality = resources.getString(R.string.profile_unknown_nationality),
                 imageUrl = null
             )
         )
@@ -103,16 +108,12 @@ class ProfileViewModel @Inject constructor(
                     _editableFullName.value = persistedUser.fullName
                     _editableEmail.value = persistedUser.email
                     _editableNationality.value = persistedUser.nationality
-                    _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Perfil actualizado exitosamente."))
+                    _uiEvent.emit(ProfileUiEvent.ShowSnackbar(resources.getString(R.string.message_profile_updated_success)))
                 }
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = "Error al guardar perfil: ${e.localizedMessage ?: "Desconocido"}",
-                        isLoading = false
-                    )
-                }
-                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Error al guardar perfil: ${e.localizedMessage ?: "Desconocido"}"))
+                val errorMessage = resources.getString(R.string.message_profile_update_error, e.localizedMessage ?: "")
+                _uiState.update { it.copy(errorMessage = errorMessage, isLoading = false) }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar(errorMessage))
             }
         }
     }
@@ -121,7 +122,11 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(showImageUploadProgress = true, errorMessage = null) }
             try {
-                val imageUrl = userRepository.uploadProfileImage(imageData)
+                val imageUrl = when (imageData) {
+                    is Bitmap -> userRepository.uploadProfileImage(imageData)
+                    is Uri -> userRepository.uploadProfileImage(imageData)
+                    else -> throw IllegalArgumentException("Unsupported image data type")
+                }
 
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -129,15 +134,11 @@ class ProfileViewModel @Inject constructor(
                         showImageUploadProgress = false
                     )
                 }
-                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Imagen subida exitosamente."))
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar(resources.getString(R.string.message_image_upload_success)))
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = "Error al subir imagen: ${e.localizedMessage ?: "Desconocido"}",
-                        showImageUploadProgress = false
-                    )
-                }
-                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Error al subir imagen: ${e.localizedMessage ?: "Desconocido"}"))
+                val errorMessage = resources.getString(R.string.message_image_upload_error, e.localizedMessage ?: "")
+                _uiState.update { it.copy(errorMessage = errorMessage, showImageUploadProgress = false) }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar(errorMessage))
             }
         }
     }
@@ -150,22 +151,18 @@ class ProfileViewModel @Inject constructor(
                     ProfileUiState(
                         user = User(
                             id = "logged_out",
-                            fullName = "Invitado",
+                            fullName = resources.getString(R.string.profile_guest_user),
                             email = "",
                             nationality = "",
                             imageUrl = null
-                        ),
-                        isEditing = false,
-                        isLoading = false,
-                        showImageUploadProgress = false
+                        )
                     )
                 }
-                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Sesión cerrada exitosamente."))
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar(resources.getString(R.string.message_logout_success)))
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(errorMessage = "Error al cerrar sesión: ${e.localizedMessage ?: "Desconocido"}")
-                }
-                _uiEvent.emit(ProfileUiEvent.ShowSnackbar("Error al cerrar sesión: ${e.localizedMessage ?: "Desconocido"}"))
+                val errorMessage = resources.getString(R.string.message_logout_error, e.localizedMessage ?: "")
+                _uiState.update { it.copy(errorMessage = errorMessage) }
+                _uiEvent.emit(ProfileUiEvent.ShowSnackbar(errorMessage))
             }
         }
     }

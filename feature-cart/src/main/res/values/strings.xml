@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cart_title">Tu Carrito</string>
+    <string name="cart_empty_title">¡Tu carrito está vacío!</string>
+    <string name="cart_empty_subtitle">Explora nuestros productos y añade tus favoritos.</string>
+    <string name="action_go_to_products">Ir a Productos</string>
+    <string name="action_checkout">Proceder al Pago</string>
+    <string name="action_continue_shopping">Seguir Comprando</string>
+    <string name="label_total">Total:</string>
+
+    <string name="price_format_ars">$%1$.2f</string>
+    <string name="label_price">Precio: %1$s</string>
+    <string name="label_item_total">Total ítem: %1$s</string>
+
+    <string name="error_unknown">Desconocido</string>
+    <string name="error_updating_quantity">Error al actualizar cantidad: %1$s</string>
+    <string name="error_removing_item">Error al eliminar producto: %1$s</string>
+    <string name="error_clearing_cart">Error al vaciar carrito: %1$s</string>
+    <string name="error_checkout">Error al procesar la compra: %1$s</string>
+    <string name="checkout_success_message">Compra realizada exitosamente. ¡Gracias!</string>
+
+    <string name="content_desc_cart_icon">Carrito de Compras</string>
+    <string name="content_desc_back_button">Volver</string>
+    <string name="content_desc_clear_cart">Vaciar carrito</string>
+    <string name="content_desc_empty_cart">Carrito Vacío</string>
+    <string name="content_desc_decrease_quantity">Disminuir cantidad</string>
+    <string name="content_desc_increase_quantity">Aumentar cantidad</string>
+    <string name="content_desc_remove_item">Eliminar ítem</string>
+    <string name="content_desc_continue_shopping_icon">Ícono de seguir comprando</string>
+
+</resources>

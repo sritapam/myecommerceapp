@@ -24,11 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.henrypeya.core.model.domain.model.cart.CartItem
+import com.henrypeya.feature_cart.R
 
 @Composable
 fun CartItemRow(
@@ -38,22 +41,24 @@ fun CartItemRow(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.elevation_low))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(dimensionResource(id = R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
                 model = cartItem.product.imageUrl,
                 contentDescription = cartItem.product.name,
                 modifier = Modifier
-                    .size(80.dp)
-                    .padding(end = 8.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
+                    .size(dimensionResource(id = R.dimen.cart_item_image_size))
+                    .padding(end = dimensionResource(id = R.dimen.spacing_small))
+                    .clip(RoundedCornerShape(dimensionResource(id = R.dimen.cart_item_corner_radius))),
+                contentScale = ContentScale.Crop,
+                error = painterResource(id = R.drawable.ic_launcher),
+                fallback = painterResource(id = R.drawable.ic_launcher)
             )
 
             Column(modifier = Modifier.weight(1f)) {
@@ -64,12 +69,21 @@ fun CartItemRow(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    "Precio: $${String.format("%.2f", cartItem.product.price)}",
+                    text = stringResource(
+                        id = R.string.label_price,
+                        stringResource(id = R.string.price_format_ars, cartItem.product.price)
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    "Total ítem: $${String.format("%.2f", cartItem.calculateTotalPrice())}",
+                    text = stringResource(
+                        id = R.string.label_item_total,
+                        stringResource(
+                            id = R.string.price_format_ars,
+                            cartItem.calculateTotalPrice()
+                        )
+                    ),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -77,13 +91,13 @@ fun CartItemRow(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_extra_small))
             ) {
 
                 Surface(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large))
                 ) {
                     IconButton(
                         onClick = { onQuantityChange(cartItem.product.id, cartItem.quantity - 1) },
@@ -91,9 +105,9 @@ fun CartItemRow(
                     ) {
                         Icon(
                             Icons.Default.Remove,
-                            contentDescription = "Disminuir cantidad",
+                            contentDescription = stringResource(id = R.string.content_desc_decrease_quantity),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        ) // Color del icono
+                        )
                     }
                 }
 
@@ -102,16 +116,16 @@ fun CartItemRow(
                 Surface(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large))
                 ) {
                     IconButton(
                         onClick = { onQuantityChange(cartItem.product.id, cartItem.quantity + 1) }
                     ) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = "Aumentar cantidad",
+                            contentDescription = stringResource(id = R.string.content_desc_increase_quantity),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        ) // Color del icono
+                        )
                     }
                 }
 
@@ -120,7 +134,7 @@ fun CartItemRow(
                 ) {
                     Icon(
                         Icons.Default.Delete,
-                        contentDescription = "Eliminar ítem",
+                        contentDescription = stringResource(id = R.string.content_desc_remove_item),
                     )
                 }
             }

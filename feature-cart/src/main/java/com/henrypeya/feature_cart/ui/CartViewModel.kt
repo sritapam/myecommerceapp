@@ -8,7 +8,9 @@ import com.henrypeya.core.model.domain.usecase.cart.ClearCartUseCase
 import com.henrypeya.core.model.domain.usecase.cart.GetCartItemsUseCase
 import com.henrypeya.core.model.domain.usecase.cart.RemoveCartItemUseCase
 import com.henrypeya.core.model.domain.usecase.cart.UpdateCartItemQuantityUseCase
+import com.henrypeya.feature_cart.R
 import com.henrypeya.feature_cart.ui.state.CartState
+import com.henrypeya.library.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,6 +29,7 @@ class CartViewModel @Inject constructor(
     private val removeCartItemUseCase: RemoveCartItemUseCase,
     private val clearCartUseCase: ClearCartUseCase,
     private val checkoutCartUseCase: CheckoutCartUseCase,
+    private val resources: ResourceProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CartState())
@@ -61,7 +64,10 @@ class CartViewModel @Inject constructor(
             try {
                 updateCartItemQuantityUseCase(productId, newQuantity)
             } catch (e: Exception) {
-                _messageEventFlow.emit("Error al actualizar cantidad: ${e.localizedMessage ?: "Desconocido"}")
+                _messageEventFlow.emit(resources.getString(
+                    R.string.error_updating_quantity,
+                    e.localizedMessage ?: resources.getString(R.string.error_unknown)
+                ))
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -74,7 +80,10 @@ class CartViewModel @Inject constructor(
             try {
                 removeCartItemUseCase(productId)
             } catch (e: Exception) {
-                _messageEventFlow.emit("Error al eliminar producto: ${e.localizedMessage ?: "Desconocido"}")
+                _messageEventFlow.emit(resources.getString(
+                    R.string.error_removing_item,
+                    e.localizedMessage ?: resources.getString(R.string.error_unknown)
+                ))
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -87,7 +96,10 @@ class CartViewModel @Inject constructor(
             try {
                 clearCartUseCase()
             } catch (e: Exception) {
-                _messageEventFlow.emit("Error al vaciar carrito: ${e.localizedMessage ?: "Desconocido"}")
+                _messageEventFlow.emit(resources.getString(
+                    R.string.error_clearing_cart,
+                    e.localizedMessage ?: resources.getString(R.string.error_unknown)
+                ))
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
@@ -99,12 +111,15 @@ class CartViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 checkoutCartUseCase()
-                _messageEventFlow.emit("Compra realizada exitosamente. ¡Gracias!")
+                _messageEventFlow.emit(resources.getString(R.string.checkout_success_message))
                 _navigateEventFlow.emit(Unit)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        errorMessage = "Error al procesar la compra: ${e.localizedMessage ?: "Desconocido"}"
+                        errorMessage = resources.getString(
+                            R.string.error_checkout,
+                            e.localizedMessage ?: resources.getString(R.string.error_unknown)
+                        )
                     )
                 }
             } finally {

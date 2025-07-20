@@ -8,7 +8,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import com.henrypeya.feature_profile.R
 
 @Composable
 fun ProfileDetailsEditor(
@@ -21,9 +23,9 @@ fun ProfileDetailsEditor(
     isEditing: Boolean
 ) {
     Column {
-        ProfileTextField("Nombre y Apellido", editableName, onNameChange, isEditing)
-        ProfileTextField("Email", editableEmail, onEmailChange, false)
-        ProfileTextField("Nacionalidad", editableNationality, onNationalityChange, isEditing)
+        ProfileTextField(stringResource(id = R.string.label_full_name), editableName, onNameChange, isEditing)
+        ProfileTextField(stringResource(id = R.string.label_email), editableEmail, onEmailChange, false)
+        ProfileTextField(stringResource(id = R.string.label_nationality), editableNationality, onNationalityChange, isEditing)
     }
 }
 
@@ -41,5 +43,5 @@ fun ProfileTextField(
         enabled = isEnabled,
         modifier = Modifier.fillMaxWidth()
     )
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_small)))
 }

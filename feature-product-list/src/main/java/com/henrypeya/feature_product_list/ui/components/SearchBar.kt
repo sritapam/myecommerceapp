@@ -1,4 +1,4 @@
-package com.henrypeya.feature_product_list.ui
+package com.henrypeya.feature_product_list.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,8 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
+import com.henrypeya.feature_product_list.R
 
 @Composable
 fun SearchBar(
@@ -38,8 +40,8 @@ fun SearchBar(
         onValueChange = { newValue ->
             onSearchQueryChange(newValue)
         },
-        placeholder = { Text("Buscar plato...") },
-        shape = RoundedCornerShape(50),
+        placeholder = { Text(stringResource(id = R.string.search_placeholder)) },
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius_50)),
         trailingIcon = {
             val iconToShow = if (searchQuery.isEmpty()) Icons.Default.Search else Icons.Default.Clear
             val iconAction = if (searchQuery.isEmpty()) {
@@ -50,7 +52,7 @@ fun SearchBar(
 
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(dimensionResource(id = R.dimen.icon_size_36))
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
                     .clickable {
@@ -61,14 +63,21 @@ fun SearchBar(
             ) {
                 Icon(
                     imageVector = iconToShow,
-                    contentDescription = if (searchQuery.isEmpty()) "Icono de Búsqueda" else "Borrar texto",
+                    contentDescription = if (searchQuery.isEmpty())
+                        stringResource(id = R.string.icon_search_description)
+                    else
+                        stringResource(id = R.string.icon_clear_description),
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         },
         modifier = Modifier
             .fillMaxWidth()
-            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(50)),
+            .border(
+                dimensionResource(id = R.dimen.border_2),
+                MaterialTheme.colorScheme.primary,
+                RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius_50))
+            ),
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(
@@ -78,5 +87,5 @@ fun SearchBar(
             }
         ),
 
-    )
+        )
 }
