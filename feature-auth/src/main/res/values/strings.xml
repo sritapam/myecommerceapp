@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="content_desc_back_button">Volver</string>
+    <string name="content_desc_app_logo">Logo de la App</string>
+    <string name="content_desc_email_icon">Icono de email</string>
+    <string name="content_desc_password_icon">Icono de candado</string>
+    <string name="content_desc_person_icon">Icono de persona</string>
+    <string name="content_desc_show_password">Mostrar contraseña</string>
+    <string name="content_desc_hide_password">Ocultar contraseña</string>
+    <string name="content_desc_visibility_icon">Icono de visibilidad de contraseña</string>
+
+    <string name="login_title">Inicia sesión</string>
+    <string name="login_button_text">Iniciar Sesión</string>
+    <string name="login_prompt_register_prefix">¿No tenés cuenta? </string>
+    <string name="login_prompt_register_clickable">Regístrate</string>
+
+    <string name="register_title">Crea tu cuenta</string>
+    <string name="register_button_text">Registrarse</string>
+    <string name="register_prompt_login_prefix">¿Ya tienes una cuenta? </string>
+    <string name="register_prompt_login_clickable">Iniciar sesión</string>
+
+    <string name="form_label_email">Email</string>
+    <string name="form_label_password">Contraseña</string>
+    <string name="form_label_full_name">Nombre Completo</string>
+    <string name="form_label_confirm_password">Confirmar Contraseña</string>
+
+    <string name="validation_error_email_empty">El email no puede estar vacío</string>
+    <string name="validation_error_email_invalid">Formato de email inválido</string>
+    <string name="validation_error_password_empty">La contraseña no puede estar vacía</string>
+    <string name="validation_error_password_too_short">La contraseña debe tener al menos 8 caracteres</string>
+    <string name="validation_error_fullname_empty">El nombre no puede estar vacío</string>
+    <string name="validation_error_confirm_password_empty">Confirma tu contraseña</string>
+    <string name="validation_error_passwords_no_match">Las contraseñas no coinciden</string>
+    <string name="validation_error_form_generic">Por favor, corrige los errores del formulario</string>
+
+    <string name="state_success_login">Inicio de sesión exitoso</string>
+    <string name="state_success_register">Registro exitoso. Iniciando sesión automáticamente…</string>
+    <string name="state_error_invalid_credentials">Credenciales inválidas</string>
+    <string name="state_error_register_failed">Error al registrar usuario. Intenta de nuevo</string>
+    <string name="state_error_unknown_login">Error desconocido al iniciar sesión</string>
+    <string name="state_error_unknown_register">Error desconocido al registrarse</string>
+</resources>

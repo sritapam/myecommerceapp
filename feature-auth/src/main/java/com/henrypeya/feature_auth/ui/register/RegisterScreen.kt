@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -19,7 +18,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -57,7 +58,7 @@ fun RegisterScreen(
     AuthSnackbarHandler(
         uiState = registerState,
         snackbarHostState = snackbarHostState,
-        onMessageShown = viewModel::onMessageShown
+        onMessageShown = { viewModel.onMessageShown() },
     )
 
     LaunchedEffect(Unit) {
@@ -83,61 +84,81 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = dimensionResource(id = R.dimen.screen_padding_horizontal)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large_alt)))
 
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher),
-                contentDescription = "Logo de la App",
-                modifier = Modifier.size(150.dp)
+                contentDescription = stringResource(id = R.string.content_desc_app_logo),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.logo_size_large))
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
 
             Text(
-                "Crea tu cuenta",
+                text = stringResource(id = R.string.register_title),
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
 
             AppOutlinedTextField(
                 value = fullName,
                 onValueChange = viewModel::onFullNameChange,
-                label = "Nombre Completo",
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Icono de persona") },
+                label = stringResource(id = R.string.form_label_full_name),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = stringResource(id = R.string.content_desc_person_icon)
+                    )
+                },
                 isError = fullNameError != null,
                 errorMessage = fullNameError
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
 
             AppOutlinedTextField(
                 value = email,
                 onValueChange = viewModel::onEmailChange,
-                label = "Email",
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Icono de email") },
+                label = stringResource(id = R.string.form_label_email),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Email,
+                        contentDescription = stringResource(id = R.string.content_desc_email_icon)
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 isError = emailError != null,
                 errorMessage = emailError
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
 
             AppOutlinedTextField(
                 value = password,
                 onValueChange = viewModel::onPasswordChange,
-                label = "Contraseña",
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Icono de candado") },
+                label = stringResource(id = R.string.form_label_password),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Lock,
+                        contentDescription = stringResource(id = R.string.content_desc_password_icon)
+                    )
+                },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
-                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                    val image =
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (passwordVisible) {
+                        stringResource(id = R.string.content_desc_hide_password)
+                    } else {
+                        stringResource(id = R.string.content_desc_show_password)
+                    }
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, description)
                     }
@@ -145,18 +166,28 @@ fun RegisterScreen(
                 isError = passwordError != null,
                 errorMessage = passwordError
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
 
             AppOutlinedTextField(
                 value = confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
-                label = "Confirmar Contraseña",
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Icono de candado") },
+                label = stringResource(id = R.string.form_label_confirm_password),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Lock,
+                        contentDescription = stringResource(id = R.string.content_desc_password_icon)
+                    )
+                },
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
-                    val image = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (confirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                    val image =
+                        if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (confirmPasswordVisible) {
+                        stringResource(id = R.string.content_desc_hide_password)
+                    } else {
+                        stringResource(id = R.string.content_desc_show_password)
+                    }
                     IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                         Icon(imageVector = image, description)
                     }
@@ -164,19 +195,19 @@ fun RegisterScreen(
                 isError = confirmPasswordError != null,
                 errorMessage = confirmPasswordError
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
 
             AuthButton(
-                text = "Registrarse",
+                text = stringResource(id = R.string.register_button_text),
                 onClick = viewModel::register,
                 isLoading = registerState.isLoading,
                 isEnabled = isFormValid && !registerState.isLoading
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium_large)))
 
             AuthNavigationText(
-                prefixText = "¿Ya tienes una cuenta? ",
-                clickableText = "Iniciar sesión",
+                prefixText = stringResource(id = R.string.register_prompt_login_prefix),
+                clickableText = stringResource(id = R.string.register_prompt_login_clickable),
                 onClick = {
                     navController.navigate("login_route") {
                         popUpTo(navController.graph.startDestinationId) { inclusive = false }

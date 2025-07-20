@@ -31,14 +31,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.henrypeya.feature_auth.R
@@ -68,7 +69,7 @@ fun LoginScreen(
     AuthSnackbarHandler(
         uiState = loginState,
         snackbarHostState = snackbarHostState,
-        onMessageShown = viewModel::onMessageShown
+        onMessageShown = { viewModel.onMessageShown() },
     )
 
     LaunchedEffect(Unit) {
@@ -85,53 +86,56 @@ fun LoginScreen(
     }
 
     Scaffold(
-        topBar = {
-            AppTopBar(navController = navController)
-        },
+        topBar = { AppTopBar(navController = navController) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = dimensionResource(id = R.dimen.screen_padding_horizontal)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_extra_large)))
 
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher),
-                contentDescription = "Logo de la App",
-                modifier = Modifier.size(150.dp)
+                contentDescription = stringResource(id = R.string.content_desc_app_logo),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.logo_size_large))
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
 
             Text(
-                "Inicia sesión",
+                stringResource(id = R.string.login_title),
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
 
             AppOutlinedTextField(
                 value = email,
                 onValueChange = viewModel::onEmailChange,
-                label = "Email",
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                label = stringResource(id = R.string.form_label_email),
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Email,
+                        contentDescription = stringResource(id = R.string.content_desc_email_icon)
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 isError = emailError != null,
                 errorMessage = emailError
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
 
             AppOutlinedTextField(
                 value = password,
                 onValueChange = viewModel::onPasswordChange,
-                label = "Contraseña",
+                label = stringResource(id = R.string.form_label_password),
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -139,26 +143,26 @@ fun LoginScreen(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = null
+                            contentDescription = null // Podríamos añadirlo al XML también
                         )
                     }
                 },
                 isError = passwordError != null,
                 errorMessage = passwordError
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_large)))
 
             AuthButton(
-                text = "Iniciar Sesión",
+                text = stringResource(id = R.string.login_button_text),
                 onClick = viewModel::login,
                 isLoading = loginState.isLoading,
                 isEnabled = isFormValid && !loginState.isLoading
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium_large)))
 
             AuthNavigationText(
-                prefixText = "¿No tenés cuenta? ",
-                clickableText = "Regístrate",
+                prefixText = stringResource(id = R.string.login_prompt_register_prefix),
+                clickableText = stringResource(id = R.string.login_prompt_register_clickable),
                 onClick = {
                     navController.navigate("register_route") {
                         popUpTo(navController.graph.startDestinationId) { inclusive = false }

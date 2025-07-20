@@ -10,8 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import com.henrypeya.feature_auth.R
 
 @Composable
 fun AuthButton(
@@ -26,13 +27,13 @@ fun AuthButton(
         enabled = isEnabled,
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp),
-        shape = RoundedCornerShape(16.dp)
+            .height(dimensionResource(id = R.dimen.button_height_standard)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.corner_radius_large))
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(dimensionResource(id = R.dimen.progress_indicator_size))
             )
         } else {
             Text(

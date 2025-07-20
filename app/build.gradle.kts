@@ -111,6 +111,7 @@ android {
         implementation(project(":core:model"))
         implementation(project(":core:ui"))
         implementation(project(":data"))
+        implementation(project(":library:utils"))
 
         testImplementation(libs.junit)
         androidTestImplementation(libs.androidx.junit)

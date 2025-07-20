@@ -1,12 +1,13 @@
 package com.henrypeya.feature_auth.ui.login
 
-import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
-import com.henrypeya.feature_auth.ui.components.MessageType
+import com.henrypeya.feature_auth.R
 import com.henrypeya.feature_auth.ui.navigation.NavigationEvent
 import com.henrypeya.feature_auth.ui.state.LoginState
+import com.henrypeya.library.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
+class LoginViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val resources: ResourceProvider
+) : ViewModel() {
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
@@ -63,11 +67,11 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
 
     private fun validateEmail(email: String): Boolean {
         if (email.isBlank()) {
-            _emailError.value = "El email no puede estar vacío"
+            _emailError.value = resources.getString(R.string.validation_error_email_empty)
             return false
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailError.value = "Formato de email inválido."
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _emailError.value = resources.getString(R.string.validation_error_email_invalid)
             return false
         }
         _emailError.value = null
@@ -76,11 +80,11 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
 
     private fun validatePassword(password: String): Boolean {
         if (password.isBlank()) {
-            _passwordError.value = "La contraseña no puede estar vacía."
+            _passwordError.value = resources.getString(R.string.validation_error_password_empty)
             return false
         }
         if (password.length < 8) {
-            _passwordError.value = "La contraseña debe tener al menos 8 caracteres."
+            _passwordError.value = resources.getString(R.string.validation_error_password_too_short)
             return false
         }
         _passwordError.value = null
@@ -96,7 +100,8 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
         val isPasswordValid = validatePassword(password.value)
 
         if (!isEmailValid || !isPasswordValid) {
-            _loginState.value = LoginState.Error("Por favor, corrige los errores del formulario.")
+            _loginState.value =
+                LoginState.Error(resources.getString(R.string.validation_error_form_generic))
             return
         }
 
@@ -108,7 +113,7 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
 
                 if (loginSuccess) {
                     _loginState.value =
-                        LoginState.Success("Inicio de sesión exitoso.")
+                        LoginState.Success(resources.getString(R.string.state_success_login))
                     _navigationEvents.send(
                         NavigationEvent.NavigateTo(
                             route = "main_app_graph",
@@ -117,17 +122,18 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
                         )
                     )
                 } else {
-                    _loginState.value = LoginState.Error("Credenciales inválidas.")
+                    _loginState.value =
+                        LoginState.Error(resources.getString(R.string.state_error_invalid_credentials))
                 }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "Error durante login: ${e.message}", e)
-                _loginState.value =
-                    LoginState.Error(e.message ?: "Error desconocido al iniciar sesión.")
+                _loginState.value = LoginState.Error(
+                    e.message ?: resources.getString(R.string.state_error_unknown_login)
+                )
             }
         }
     }
 
-    fun onMessageShown(messageType: MessageType) {
+    fun onMessageShown() {
         if (_loginState.value is LoginState.Error || _loginState.value is LoginState.Success) {
             _loginState.value = LoginState.Idle
         }

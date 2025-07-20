@@ -12,6 +12,8 @@ import com.henrypeya.data.repository.product.ProductRepositoryImpl
 import com.henrypeya.data.repository.user.UserRepositoryImpl
 import com.henrypeya.data.service.imageupload.CloudinaryService
 import com.henrypeya.data.service.imageupload.CloudinaryServiceImpl
+import com.henrypeya.library.utils.ResourceProvider
+import com.henrypeya.library.utils.ResourceProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -58,4 +60,10 @@ abstract class AppModule {
     abstract fun bindOrderRepository(
         orderRepositoryImpl: OrderRepositoryImpl
     ): OrderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindResourceProvider(
+        resourceProviderImpl: ResourceProviderImpl
+    ): ResourceProvider
 }
