@@ -1,6 +1,7 @@
 package com.henrypeya.feature_product_list.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,12 +37,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductListScreen(
+    navController: NavController,
     viewModel: ProductListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -87,6 +90,7 @@ fun ProductListScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
+
             Spacer(modifier = Modifier.height(12.dp))
 
             Card(
@@ -121,62 +125,64 @@ fun ProductListScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                state = lazyColumnState,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item {
-                    CategorySelectorRow(
-                        selectedCategory = uiState.selectedCategory,
-                        onCategorySelected = viewModel::onCategorySelected,
-                        categories = uiState.categories
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                when {
-                    uiState.isLoading -> item {
+            when {
+                uiState.isLoading && uiState.filteredProducts.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         CircularProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
+                            modifier = Modifier.size(48.dp)
                         )
                     }
+                }
+                uiState.errorMessage != null -> {
+                    Text(
+                        text = uiState.errorMessage ?: "Error desconocido",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                uiState.filteredProducts.isEmpty() -> {
+                    Text(
+                        text = if (uiState.searchQuery.isNotBlank())
+                            "No se encontraron productos para '${uiState.searchQuery}'"
+                        else "No hay productos disponibles",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else -> {
 
-                    uiState.errorMessage != null -> item {
-                        Text(
-                            text = uiState.errorMessage ?: "Error desconocido",
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                    LazyColumn(
+                        state = lazyColumnState,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item {
+                            CategorySelectorRow(
+                                selectedCategory = uiState.selectedCategory,
+                                onCategorySelected = viewModel::onCategorySelected,
+                                categories = uiState.categories
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
 
-                    uiState.filteredProducts.isEmpty() -> item {
-                        Text(
-                            text = if (uiState.searchQuery.isNotBlank())
-                                "No se encontraron productos para '${uiState.searchQuery}'"
-                            else "No hay productos disponibles",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-
-                    else -> items(uiState.filteredProducts, key = { it.id }) { product ->
-                        ProductItem(
-                            product = product,
-                            onAddToCartClick = viewModel::addProductToCart
-                        )
+                        items(uiState.filteredProducts, key = { it.id }) { product ->
+                            ProductItem(
+                                product = product,
+                                onAddToCartClick = viewModel::addProductToCart
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-

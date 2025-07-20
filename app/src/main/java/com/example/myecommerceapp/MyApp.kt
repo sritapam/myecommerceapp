@@ -29,6 +29,7 @@ class MyApp : Application(), Configuration.Provider {
     lateinit var workerFactory: HiltWorkerFactory
 
     private val appScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)

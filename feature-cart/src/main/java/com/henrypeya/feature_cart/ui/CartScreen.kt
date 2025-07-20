@@ -4,20 +4,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.RemoveShoppingCart
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import com.henrypeya.core.model.domain.model.cart.CartItem
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -66,22 +66,26 @@ fun CartScreen(
         }
     }
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { message ->
-            scope.launch {//todo ver si uso errores para algo sino eliminar
-                snackbarHostState.showSnackbar(
-                    message = message,
-                    withDismissAction = true
-                )
-            }
-            viewModel.errorMessageShown()
-        }
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Carrito de Compras") },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Carrito de Compras",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Text(
+                            "Tu Carrito",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
@@ -90,10 +94,16 @@ fun CartScreen(
                 actions = {
                     if (uiState.cartItems.isNotEmpty()) {
                         IconButton(onClick = viewModel::onClearCart) {
-                            Icon(Icons.Default.Delete, contentDescription = "Vaciar carrito")
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Vaciar carrito",
+                            )
                         }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -108,8 +118,40 @@ fun CartScreen(
                     CircularProgressIndicator()
                 }
             } else if (uiState.cartItems.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("El carrito está vacío.", style = MaterialTheme.typography.titleMedium)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.RemoveShoppingCart,
+                            contentDescription = "Carrito Vacío",
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "¡Tu carrito está vacío!",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "Explora nuestros productos y añade tus favoritos.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(onClick = {
+                            navController.navigate("products") {
+                                popUpTo("main_app_graph") { inclusive = true }
+                                launchSingleTop = true
+                                restoreState = false
+                            }
+                        }) {
+                            Text("Ir a Productos")
+                        }
+                    }
                 }
             } else {
                 LazyColumn(
@@ -141,7 +183,7 @@ fun CartScreen(
                             Text("Total:", style = MaterialTheme.typography.headlineSmall)
                             Text(
                                 "$${String.format("%.2f", uiState.totalPrice)}",
-                                style = MaterialTheme.typography.headlineSmall,
+                                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -153,6 +195,26 @@ fun CartScreen(
                         ) {
                             Text("Proceder al Pago")
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = {
+                                navController.navigate("products") {
+                                   launchSingleTop =
+                                        true
+                                    restoreState =
+                                        true
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AddShoppingCart,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Seguir Comprando")
+                        }
                     }
                 }
             }
@@ -160,65 +222,3 @@ fun CartScreen(
     }
 }
 
-@Composable
-fun CartItemRow(
-    cartItem: CartItem,
-    onQuantityChange: (productId: String, newQuantity: Int) -> Unit,
-    onRemoveItem: (productId: String) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AsyncImage(
-                model = cartItem.product.imageUrl,
-                contentDescription = cartItem.product.name,
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(end = 8.dp),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
-            )
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(cartItem.product.name, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    "Precio: $${String.format("%.2f", cartItem.product.price)}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    "Total Ítem: $${String.format("%.2f", cartItem.calculateTotalPrice())}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                IconButton(
-                    onClick = { onQuantityChange(cartItem.product.id, cartItem.quantity - 1) },
-                    enabled = cartItem.quantity > 1 // Deshabilitar si la cantidad es 1
-                ) {
-                    Icon(Icons.Default.Remove, contentDescription = "Disminuir cantidad")
-                }
-                Text("${cartItem.quantity}", style = MaterialTheme.typography.titleMedium)
-                IconButton(
-                    onClick = { onQuantityChange(cartItem.product.id, cartItem.quantity + 1) }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Aumentar cantidad")
-                }
-                IconButton(
-                    onClick = { onRemoveItem(cartItem.product.id) }
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar ítem")
-                }
-            }
-        }
-    }
-}

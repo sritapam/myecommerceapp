@@ -4,13 +4,17 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
+import com.henrypeya.feature_auth.ui.components.MessageType
+import com.henrypeya.feature_auth.ui.navigation.NavigationEvent
 import com.henrypeya.feature_auth.ui.state.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,6 +36,10 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+
+    private val _navigationEvents = Channel<NavigationEvent>()
+    val navigationEvents =
+        _navigationEvents.receiveAsFlow()
 
     val isFormValid: StateFlow<Boolean> =
         combine(
@@ -80,6 +88,10 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
     }
 
     fun login() {
+        if (_loginState.value is LoginState.Error || _loginState.value is LoginState.Success) {
+            _loginState.value = LoginState.Idle
+        }
+
         val isEmailValid = validateEmail(email.value)
         val isPasswordValid = validatePassword(password.value)
 
@@ -95,19 +107,29 @@ class LoginViewModel @Inject constructor(private val authRepository: AuthReposit
                 val loginSuccess = authRepository.login(email.value, password.value)
 
                 if (loginSuccess) {
-                    _loginState.value = LoginState.Success
+                    _loginState.value =
+                        LoginState.Success("Inicio de sesión exitoso.")
+                    _navigationEvents.send(
+                        NavigationEvent.NavigateTo(
+                            route = "main_app_graph",
+                            popUpTo = "login_route",
+                            inclusive = true
+                        )
+                    )
                 } else {
                     _loginState.value = LoginState.Error("Credenciales inválidas.")
                 }
             } catch (e: Exception) {
                 Log.e("LoginViewModel", "Error durante login: ${e.message}", e)
-                _loginState.value = LoginState.Error(e.message ?: "Error desconocido al iniciar sesión.")
+                _loginState.value =
+                    LoginState.Error(e.message ?: "Error desconocido al iniciar sesión.")
             }
         }
     }
 
-    fun errorShown() {
-        _loginState.value = LoginState.Idle
+    fun onMessageShown(messageType: MessageType) {
+        if (_loginState.value is LoginState.Error || _loginState.value is LoginState.Success) {
+            _loginState.value = LoginState.Idle
+        }
     }
-
 }

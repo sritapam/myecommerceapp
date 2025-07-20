@@ -4,13 +4,17 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
+import com.henrypeya.feature_auth.ui.components.MessageType
+import com.henrypeya.feature_auth.ui.navigation.NavigationEvent
 import com.henrypeya.feature_auth.ui.state.RegisterState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,6 +48,10 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
 
     private val _registerState = MutableStateFlow<RegisterState>(RegisterState.Idle)
     val registerState: StateFlow<RegisterState> = _registerState.asStateFlow()
+
+    private val _navigationEvents = Channel<NavigationEvent>()
+    val navigationEvents = _navigationEvents.receiveAsFlow()
+
 
     val isFormValid: StateFlow<Boolean> = combine(
         fullName, email, password, confirmPassword,
@@ -134,6 +142,10 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
     }
 
     fun register() {
+        if (_registerState.value is RegisterState.Error || _registerState.value is RegisterState.Success) {
+            _registerState.value = RegisterState.Idle
+        }
+
         val isFullNameValid = validateFullName(fullName.value)
         val isEmailValid = validateEmail(email.value)
         val isPasswordValid = validatePassword(password.value)
@@ -150,7 +162,13 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
                 val success = authRepository.register(email.value, fullName.value, password.value)
 
                 if (success) {
-                    _registerState.value = RegisterState.Success
+                    _registerState.value = RegisterState.Success("Registro exitoso. Iniciando sesión automáticamente...") // Mensaje de éxito
+                    _navigationEvents.send(
+                        NavigationEvent.NavigateTo(
+                            route = "main_app_graph",
+                            popUpTo = "register_route",
+                            inclusive = true
+                        ))
                 } else {
                     _registerState.value = RegisterState.Error("Error al registrar usuario. Intenta de nuevo.")
                 }
@@ -160,7 +178,9 @@ class RegisterViewModel @Inject constructor(private val authRepository: AuthRepo
         }
     }
 
-    fun errorShown() {
-        _registerState.value = RegisterState.Idle
+    fun onMessageShown(messageType: MessageType) {
+        if (_registerState.value is RegisterState.Error || _registerState.value is RegisterState.Success) {
+            _registerState.value = RegisterState.Idle
+        }
     }
 }

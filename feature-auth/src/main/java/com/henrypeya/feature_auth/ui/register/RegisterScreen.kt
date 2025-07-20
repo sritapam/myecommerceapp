@@ -1,5 +1,6 @@
 package com.henrypeya.feature_auth.ui.register
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -9,22 +10,28 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import kotlinx.coroutines.launch
-import com.henrypeya.core.ui.MyEcommerceAppTheme
-import com.henrypeya.feature_auth.ui.state.RegisterState
+import androidx.compose.ui.text.style.TextAlign
+import com.henrypeya.feature_auth.R
+import com.henrypeya.feature_auth.ui.components.AppOutlinedTextField
+import com.henrypeya.feature_auth.ui.components.AppTopBar
+import com.henrypeya.feature_auth.ui.components.AuthButton
+import com.henrypeya.feature_auth.ui.components.AuthNavigationText
+import com.henrypeya.feature_auth.ui.components.AuthSnackbarHandler
+import com.henrypeya.feature_auth.ui.navigation.NavigationEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavController,
@@ -46,42 +53,30 @@ fun RegisterScreen(
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(registerState) {
-        when (registerState) {
-            RegisterState.Success -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = "Registro exitoso. Iniciando sesión automáticamente...",
-                        withDismissAction = true
-                    )
+    AuthSnackbarHandler(
+        uiState = registerState,
+        snackbarHostState = snackbarHostState,
+        onMessageShown = viewModel::onMessageShown
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect { event ->
+            when (event) {
+                is NavigationEvent.NavigateTo -> {
+                    navController.navigate(event.route) {
+                        event.popUpTo?.let { popUpTo(it) { inclusive = event.inclusive } }
+                        launchSingleTop = true
+                    }
                 }
             }
-            is RegisterState.Error -> {
-                val errorMessage = (registerState as RegisterState.Error).message
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = errorMessage,
-                        withDismissAction = true
-                    )
-                }
-                viewModel.errorShown()
-            }
-            else -> { /* Idle or Loading */ }
         }
     }
 
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Registrarse") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                }
-            )
+            AppTopBar(navController = navController)
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
@@ -89,50 +84,56 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
+            Spacer(modifier = Modifier.height(30.dp))
 
-            OutlinedTextField(
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher),
+                contentDescription = "Logo de la App",
+                modifier = Modifier.size(150.dp)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                "Crea tu cuenta",
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            AppOutlinedTextField(
                 value = fullName,
                 onValueChange = viewModel::onFullNameChange,
-                label = { Text("Nombre Completo") },
+                label = "Nombre Completo",
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Icono de persona") },
                 isError = fullNameError != null,
-                modifier = Modifier.fillMaxWidth()
+                errorMessage = fullNameError
             )
-            fullNameError?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            AppOutlinedTextField(
                 value = email,
                 onValueChange = viewModel::onEmailChange,
-                label = { Text("Email") },
+                label = "Email",
+                leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Icono de email") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 isError = emailError != null,
-                modifier = Modifier.fillMaxWidth()
+                errorMessage = emailError
             )
-            emailError?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            AppOutlinedTextField(
                 value = password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text("Contraseña") },
+                label = "Contraseña",
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Icono de candado") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
@@ -143,22 +144,15 @@ fun RegisterScreen(
                     }
                 },
                 isError = passwordError != null,
-                modifier = Modifier.fillMaxWidth()
+                errorMessage = passwordError
             )
-            passwordError?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
+            AppOutlinedTextField(
                 value = confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
-                label = { Text("Confirmar Contraseña") },
+                label = "Confirmar Contraseña",
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Icono de candado") },
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
@@ -169,37 +163,29 @@ fun RegisterScreen(
                     }
                 },
                 isError = confirmPasswordError != null,
-                modifier = Modifier.fillMaxWidth()
+                errorMessage = confirmPasswordError
             )
-            confirmPasswordError?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            Button(
+            AuthButton(
+                text = "Registrarse",
                 onClick = viewModel::register,
-                enabled = isFormValid && registerState !is RegisterState.Loading,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (registerState is RegisterState.Loading) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
-                } else {
-                    Text("Registrarse")
-                }
-            }
-        }
-    }
-}
+                isLoading = registerState.isLoading,
+                isEnabled = isFormValid && !registerState.isLoading
+            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-@Preview(showBackground = true)
-@Composable
-fun RegisterScreenPreview() {
-    MyEcommerceAppTheme {
-        RegisterScreen(navController = rememberNavController())
+            AuthNavigationText(
+                prefixText = "¿Ya tienes una cuenta? ",
+                clickableText = "Iniciar sesión",
+                onClick = {
+                    navController.navigate("login_route") {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            )
+            Spacer(modifier = Modifier.weight(1f))
+        }
     }
 }
