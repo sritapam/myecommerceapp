@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.RemoveShoppingCart
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -21,6 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.henrypeya.feature_cart.ui.components.CartItemRow
+import com.henrypeya.feature_cart.ui.state.CartEvent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -33,6 +34,8 @@ fun CartScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    var showPaymentSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.messageEventFlow.collectLatest { message ->
@@ -67,6 +70,33 @@ fun CartScreen(
             }
             viewModel.errorMessageShown()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is CartEvent.ShowSnackbar -> {
+                    scope.launch {
+                        snackbarHostState.showSnackbar(event.message, withDismissAction = true)
+                    }
+                }
+                is CartEvent.NavigateToOrderSuccess -> {
+                    navController.navigate("order_success_route") {
+                        popUpTo("cart_route") { inclusive = true }
+                    }
+                }
+            }
+        }
+    }
+
+    if (showPaymentSheet) {
+        PaymentBottomSheet(
+            onDismiss = { showPaymentSheet = false },
+            onConfirm = { paymentMethod ->
+                showPaymentSheet = false
+                viewModel.onCheckout(paymentMethod)
+            }
+        )
     }
 
     Scaffold(
@@ -192,8 +222,8 @@ fun CartScreen(
                         }
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.spacing_medium)))
                         Button(
-                            onClick = viewModel::onCheckout,
                             modifier = Modifier.fillMaxWidth(),
+                            onClick = { showPaymentSheet = true },
                             enabled = uiState.cartItems.isNotEmpty() && !uiState.isLoading
                         ) {
                             Text(stringResource(id = R.string.action_checkout))

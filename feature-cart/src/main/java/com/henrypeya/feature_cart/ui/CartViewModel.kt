@@ -3,12 +3,14 @@ package com.henrypeya.feature_cart.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.model.cart.CartItem
+import com.henrypeya.core.model.domain.model.cart.PaymentMethod
 import com.henrypeya.core.model.domain.usecase.cart.CheckoutCartUseCase
 import com.henrypeya.core.model.domain.usecase.cart.ClearCartUseCase
 import com.henrypeya.core.model.domain.usecase.cart.GetCartItemsUseCase
 import com.henrypeya.core.model.domain.usecase.cart.RemoveCartItemUseCase
 import com.henrypeya.core.model.domain.usecase.cart.UpdateCartItemQuantityUseCase
 import com.henrypeya.feature_cart.R
+import com.henrypeya.feature_cart.ui.state.CartEvent
 import com.henrypeya.feature_cart.ui.state.CartState
 import com.henrypeya.library.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +42,10 @@ class CartViewModel @Inject constructor(
 
     private val _navigateEventFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val navigateEventFlow = _navigateEventFlow.asSharedFlow()
+
+    private val _eventFlow = MutableSharedFlow<CartEvent>(extraBufferCapacity = 1)
+    val eventFlow = _eventFlow.asSharedFlow()
+
 
     init {
         viewModelScope.launch {
@@ -106,13 +112,14 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun onCheckout() {
+    fun onCheckout(paymentMethod: PaymentMethod) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 checkoutCartUseCase()
                 _messageEventFlow.emit(resources.getString(R.string.checkout_success_message))
                 _navigateEventFlow.emit(Unit)
+                _eventFlow.emit(CartEvent.NavigateToOrderSuccess)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(

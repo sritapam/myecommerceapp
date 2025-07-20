@@ -1,4 +1,4 @@
-package com.henrypeya.feature_cart.ui
+package com.henrypeya.feature_cart.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

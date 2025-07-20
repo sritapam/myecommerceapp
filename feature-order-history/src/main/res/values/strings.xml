@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="order_history_title">Historial de Pedidos</string>
+    <string name="order_history_empty_title">No hay pedidos en tu historial.</string>
+    <string name="action_go_to_products">Ir a Productos</string>
+
+    <string name="label_order_date">Fecha: %1$s</string>
+    <string name="label_order_total">Total: $%1$.2f</string>
+    <string name="order_item_format">- %1$s (x%2$d)</string>
+
+    <string name="content_desc_back_button">Volver</string>
+    <string name="content_desc_no_orders_icon">Ícono de no hay pedidos</string>
+</resources>

@@ -28,4 +28,11 @@
     <string name="content_desc_remove_item">Eliminar ítem</string>
     <string name="content_desc_continue_shopping_icon">Ícono de seguir comprando</string>
 
+    <string name="payment_method_title">Elige un método de pago</string>
+    <string name="payment_method_card">Tarjeta</string>
+    <string name="payment_method_cash">Efectivo</string>
+    <string name="action_confirm_payment">Confirmar Pago</string>
+    <string name="checkout_success_title">¡Gracias por tu compra!</string>
+    <string name="checkout_success_subtitle">Tu pedido se está preparando...</string>
+
 </resources>

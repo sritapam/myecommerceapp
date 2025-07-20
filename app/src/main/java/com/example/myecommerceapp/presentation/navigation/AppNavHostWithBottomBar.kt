@@ -29,6 +29,7 @@ import com.henrypeya.feature_auth.ui.AuthViewModel
 import com.henrypeya.feature_auth.ui.login.LoginScreen
 import com.henrypeya.feature_auth.ui.register.RegisterScreen
 import com.henrypeya.feature_cart.ui.CartScreen
+import com.henrypeya.feature_cart.ui.components.OrderSuccessScreen
 import com.henrypeya.feature_order_history.ui.OrderHistoryScreen
 import com.henrypeya.feature_product_list.ui.ProductListScreen
 import com.henrypeya.feature_profile.ui.ProfileScreen
@@ -149,6 +150,9 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                 }
                 composable("order_history_route") {
                     OrderHistoryScreen(navController = navController)
+                }
+                composable("order_success_route") { // <-- AÑADIR ESTO
+                    OrderSuccessScreen(navController = navController)
                 }
             }
         }
