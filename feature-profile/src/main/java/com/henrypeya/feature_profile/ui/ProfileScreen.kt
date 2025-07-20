@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -88,7 +89,10 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(title = {
-                Text("Hola, ${uiState.user.fullName.split(" ").firstOrNull() ?: "Usuario"}")
+                Text(
+                    "Hola, ${uiState.user.fullName.split(" ").firstOrNull() ?: "Usuario"}!",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                )
             })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -105,10 +109,15 @@ fun ProfileScreen(
                 onCameraClick = {
                     val perm = Manifest.permission.CAMERA
                     when {
-                        ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED ->
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            perm
+                        ) == PackageManager.PERMISSION_GRANTED ->
                             cameraLauncher.launch(null)
+
                         shouldShowRequestPermissionRationale(context, perm) ->
                             showCameraPermissionDialog = true
+
                         else -> requestCameraPermissionLauncher.launch(perm)
                     }
                 },
@@ -116,10 +125,15 @@ fun ProfileScreen(
                     val perm = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                         Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
                     when {
-                        ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED ->
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            perm
+                        ) == PackageManager.PERMISSION_GRANTED ->
                             galleryLauncher.launch("image/*")
+
                         shouldShowRequestPermissionRationale(context, perm) ->
                             showGalleryPermissionDialog = true
+
                         else -> requestGalleryPermissionLauncher.launch(perm)
                     }
                 },

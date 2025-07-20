@@ -73,7 +73,6 @@ fun RegisterScreen(
         }
     }
 
-
     Scaffold(
         topBar = {
             AppTopBar(navController = navController)

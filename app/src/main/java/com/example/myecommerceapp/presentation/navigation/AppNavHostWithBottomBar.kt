@@ -1,6 +1,5 @@
 package com.example.myecommerceapp.presentation.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -45,10 +44,7 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
     LaunchedEffect(Unit) {
         val loggedInStatus = authViewModel.isLoggedIn().first()
         actualStartDestination = if (loggedInStatus) "main_app_graph" else "login_route"
-        Log.d(
-            "AppNavHost",
-            "Initial login status: $loggedInStatus, navigating to: $actualStartDestination"
-        )
+
         if (navController.currentDestination?.route != actualStartDestination) {
             navController.navigate(actualStartDestination) {
                 popUpTo(navController.graph.id) {
@@ -113,8 +109,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                                         launchSingleTop = true
                                         restoreState = false
                                     }
-                                } else {
-                                    Log.d("BottomNav", "Already at ${item.label}. No navigation needed.")
                                 }
                             }
                         )
