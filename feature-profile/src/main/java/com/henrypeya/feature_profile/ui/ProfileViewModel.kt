@@ -54,13 +54,20 @@ class ProfileViewModel @Inject constructor(
     private val _uiEvent = MutableSharedFlow<ProfileUiEvent>()
     val uiEvent: SharedFlow<ProfileUiEvent> = _uiEvent.asSharedFlow()
 
+    private var areEditableFieldsInitialized = false
+
     init {
         viewModelScope.launch {
-            userRepository.getUserProfile().collectLatest { user ->
+            userRepository.getUserProfile().collect { user ->
                 _uiState.update { it.copy(user = user) }
-                _editableFullName.value = user.fullName
-                _editableEmail.value = user.email
-                _editableNationality.value = user.nationality
+
+                if (!areEditableFieldsInitialized && user.id != "loading") {
+                    _editableFullName.value = user.fullName
+                    _editableEmail.value = user.email
+                    _editableNationality.value = user.nationality
+
+                    areEditableFieldsInitialized = true
+                }
             }
         }
     }

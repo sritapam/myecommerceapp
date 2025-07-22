@@ -1,6 +1,7 @@
 package com.henrypeya.feature_auth.ui.register
 
 import android.util.Patterns
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
@@ -23,20 +24,21 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val resources: ResourceProvider
+    private val resources: ResourceProvider,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _fullName = MutableStateFlow("")
-    val fullName: StateFlow<String> = _fullName.asStateFlow()
+    companion object {
+        private const val KEY_FULL_NAME = "register_full_name"
+        private const val KEY_EMAIL = "register_email"
+        private const val KEY_PASSWORD = "register_password"
+        private const val KEY_CONFIRM_PASSWORD = "register_confirm_password"
+    }
 
-    private val _email = MutableStateFlow("")
-    val email: StateFlow<String> = _email.asStateFlow()
-
-    private val _password = MutableStateFlow("")
-    val password: StateFlow<String> = _password.asStateFlow()
-
-    private val _confirmPassword = MutableStateFlow("")
-    val confirmPassword: StateFlow<String> = _confirmPassword.asStateFlow()
+    val fullName: StateFlow<String> = savedStateHandle.getStateFlow(KEY_FULL_NAME, "")
+    val email: StateFlow<String> = savedStateHandle.getStateFlow(KEY_EMAIL, "")
+    val password: StateFlow<String> = savedStateHandle.getStateFlow(KEY_PASSWORD, "")
+    val confirmPassword: StateFlow<String> = savedStateHandle.getStateFlow(KEY_CONFIRM_PASSWORD, "")
 
     private val _fullNameError = MutableStateFlow<String?>(null)
     val fullNameError: StateFlow<String?> = _fullNameError.asStateFlow()
@@ -77,23 +79,23 @@ class RegisterViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     fun onFullNameChange(newFullName: String) {
-        _fullName.value = newFullName
+        savedStateHandle[KEY_FULL_NAME] = newFullName
         validateFullName(newFullName)
     }
 
     fun onEmailChange(newEmail: String) {
-        _email.value = newEmail
+        savedStateHandle[KEY_EMAIL] = newEmail
         validateEmail(newEmail)
     }
 
     fun onPasswordChange(newPassword: String) {
-        _password.value = newPassword
+        savedStateHandle[KEY_PASSWORD] = newPassword
         validatePassword(newPassword)
-        validateConfirmPassword(_confirmPassword.value)
+        validateConfirmPassword(confirmPassword.value)
     }
 
     fun onConfirmPasswordChange(newConfirmPassword: String) {
-        _confirmPassword.value = newConfirmPassword
+        savedStateHandle[KEY_CONFIRM_PASSWORD] = newConfirmPassword
         validateConfirmPassword(newConfirmPassword)
     }
 
@@ -138,7 +140,7 @@ class RegisterViewModel @Inject constructor(
                 resources.getString(R.string.validation_error_confirm_password_empty)
             return false
         }
-        if (confirmPassword != _password.value) {
+        if (confirmPassword != password.value) {
             _confirmPasswordError.value =
                 resources.getString(R.string.validation_error_passwords_no_match)
             return false

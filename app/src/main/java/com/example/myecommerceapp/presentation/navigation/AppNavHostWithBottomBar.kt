@@ -11,15 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,55 +38,28 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
     val authViewModel: AuthViewModel = hiltViewModel()
     val isLoggedIn by authViewModel.isLoggedInState.collectAsStateWithLifecycle()
 
-    var actualStartDestination by remember { mutableStateOf("loading_screen") }
-
-    LaunchedEffect(Unit) {
-        val loggedInStatus = authViewModel.isLoggedIn().first()
-        actualStartDestination = if (loggedInStatus) "main_app_graph" else "login_route"
-
-        if (navController.currentDestination?.route != actualStartDestination) {
-            navController.navigate(actualStartDestination) {
-                popUpTo(navController.graph.id) {
-                    inclusive = true
-                    saveState = false
-                }
-                launchSingleTop = true
-                restoreState = false
-            }
-        }
-    }
-
-    LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn) {
-            if (navController.currentDestination?.route != "main_app_graph") {
-                navController.navigate("main_app_graph") {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-            }
-        } else {
-            if (navController.currentDestination?.route != "login_route") {
-                navController.navigate("login_route") {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
-            }
-        }
-    }
-
     val bottomNavItems = listOf(
-        BottomNavItem("products", "Productos", Icons.Filled.Home),
-        BottomNavItem("cart_route", "Carrito", Icons.Filled.ShoppingCart),
-        BottomNavItem("profile", "Perfil", Icons.Filled.Person)
+        BottomNavItem("products", "Productos", Icons.Default.Home),
+        BottomNavItem("cart_route", "Carrito", Icons.Default.ShoppingCart),
+        BottomNavItem("profile", "Perfil", Icons.Default.Person)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val showBottomBar = currentDestination?.hierarchy?.any { it.route == "main_app_graph" } == true
+
+    val showBottomBar = currentDestination?.hierarchy?.any {
+        it.route == "main_app_graph"
+    } == true
+
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn && currentDestination?.route != "login_route" && currentDestination?.route != "register_route") {
+            navController.navigate("login_route") {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
+            }
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -102,14 +73,12 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                             label = { Text(item.label) },
                             selected = isSelected,
                             onClick = {
-                                if (currentDestination?.route != item.route) {
-                                    navController.navigate(item.route) {
-                                        popUpTo("main_app_graph") {
-                                            inclusive = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = false
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
                                     }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
                             }
                         )
@@ -120,17 +89,24 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = actualStartDestination,
+            startDestination = "decider_route",
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable("loading_screen") {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+            composable("decider_route") {
+                val authViewModel: AuthViewModel = hiltViewModel()
+                LaunchedEffect(Unit) {
+                    val isLoggedIn = authViewModel.isLoggedIn().first()
+                    val destination = if (isLoggedIn) "main_app_graph" else "login_route"
+
+                    navController.navigate(destination) {
+                        popUpTo("decider_route") { inclusive = true }
+                    }
+                }
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
+
             composable("login_route") {
                 LoginScreen(navController = navController)
             }
@@ -148,12 +124,13 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                 composable("cart_route") {
                     CartScreen(navController = navController)
                 }
-                composable("order_history_route") {
-                    OrderHistoryScreen(navController = navController)
-                }
-                composable("order_success_route") { // <-- AÑADIR ESTO
-                    OrderSuccessScreen(navController = navController)
-                }
+            }
+
+            composable("order_history_route") {
+                OrderHistoryScreen(navController = navController)
+            }
+            composable("order_success_route") {
+                OrderSuccessScreen(navController = navController)
             }
         }
     }
