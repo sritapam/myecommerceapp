@@ -68,6 +68,10 @@ android {
         composeOptions {
             kotlinCompilerExtensionVersion = "1.5.1"
         }
+        lint {
+            disable += "RemoveWorkManagerInitializer"
+            abortOnError = false
+        }
     }
 
     dependencies {

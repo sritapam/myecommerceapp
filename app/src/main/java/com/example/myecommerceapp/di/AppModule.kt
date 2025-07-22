@@ -12,6 +12,8 @@ import com.henrypeya.data.repository.product.ProductRepositoryImpl
 import com.henrypeya.data.repository.user.UserRepositoryImpl
 import com.henrypeya.data.service.imageupload.CloudinaryService
 import com.henrypeya.data.service.imageupload.CloudinaryServiceImpl
+import com.henrypeya.feature_auth.ui.components.DefaultEmailValidator
+import com.henrypeya.feature_auth.ui.components.EmailValidator
 import com.henrypeya.library.utils.ResourceProvider
 import com.henrypeya.library.utils.ResourceProviderImpl
 import dagger.Binds
@@ -66,4 +68,10 @@ abstract class AppModule {
     abstract fun bindResourceProvider(
         resourceProviderImpl: ResourceProviderImpl
     ): ResourceProvider
+
+    @Binds
+    @Singleton
+    abstract fun bindEmailValidator(
+        defaultEmailValidator: DefaultEmailValidator
+    ): EmailValidator
 }

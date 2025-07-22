@@ -53,23 +53,25 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
-
-    // Coil (para carga de imágenes)
     implementation(libs.coil.compose)
-
-    // Módulos de tu proyecto
     implementation(project(":data"))
     implementation(project(":core:model"))
     implementation(project(":library:utils"))
     implementation(project(":core:ui"))
 
-    // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core.v5120)
+    testImplementation(libs.mockito.kotlin.v531)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.turbine)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation(libs.kotlinx.coroutines.test.v173)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

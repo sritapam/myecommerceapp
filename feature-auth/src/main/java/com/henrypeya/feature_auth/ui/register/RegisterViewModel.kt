@@ -1,11 +1,12 @@
 package com.henrypeya.feature_auth.ui.register
 
-import android.util.Patterns
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import com.henrypeya.feature_auth.R
+import com.henrypeya.feature_auth.ui.components.DefaultEmailValidator
+import com.henrypeya.feature_auth.ui.components.EmailValidator
 import com.henrypeya.feature_auth.ui.navigation.NavigationEvent
 import com.henrypeya.feature_auth.ui.state.RegisterState
 import com.henrypeya.library.utils.ResourceProvider
@@ -25,7 +26,8 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val resources: ResourceProvider,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val emailValidator: EmailValidator = DefaultEmailValidator()
 ) : ViewModel() {
 
     companion object {
@@ -113,7 +115,7 @@ class RegisterViewModel @Inject constructor(
             _emailError.value = resources.getString(R.string.validation_error_email_empty)
             return false
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!emailValidator.isValid(email)) {
             _emailError.value = resources.getString(R.string.validation_error_email_invalid)
             return false
         }

@@ -72,6 +72,13 @@ dependencies {
     implementation(project(":library:utils"))
     implementation(project(":core:ui"))
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core.v5120)
+    testImplementation(libs.mockito.kotlin.v531)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.androidx.core.testing)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

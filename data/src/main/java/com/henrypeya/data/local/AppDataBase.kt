@@ -15,7 +15,7 @@ import com.henrypeya.data.local.entities.UserEntity
 
 @Database(
     entities = [CartItemEntity::class, OrderEntity::class, UserEntity::class, ProductEntity::class],
-    version = 10, exportSchema = true
+    version = 11, exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

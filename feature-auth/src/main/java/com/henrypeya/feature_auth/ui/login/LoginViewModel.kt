@@ -1,10 +1,10 @@
 package com.henrypeya.feature_auth.ui.login
 
-import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.henrypeya.core.model.domain.repository.auth.AuthRepository
 import com.henrypeya.feature_auth.R
+import com.henrypeya.feature_auth.ui.components.EmailValidator
 import com.henrypeya.feature_auth.ui.navigation.NavigationEvent
 import com.henrypeya.feature_auth.ui.state.LoginState
 import com.henrypeya.library.utils.ResourceProvider
@@ -23,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val resources: ResourceProvider
+    private val resources: ResourceProvider,
+    private val emailValidator: EmailValidator
 ) : ViewModel() {
 
     private val _email = MutableStateFlow("")
@@ -42,8 +43,7 @@ class LoginViewModel @Inject constructor(
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
     private val _navigationEvents = Channel<NavigationEvent>()
-    val navigationEvents =
-        _navigationEvents.receiveAsFlow()
+    val navigationEvents = _navigationEvents.receiveAsFlow()
 
     val isFormValid: StateFlow<Boolean> =
         combine(
@@ -70,7 +70,7 @@ class LoginViewModel @Inject constructor(
             _emailError.value = resources.getString(R.string.validation_error_email_empty)
             return false
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!emailValidator.isValid(email)) {
             _emailError.value = resources.getString(R.string.validation_error_email_invalid)
             return false
         }
@@ -100,8 +100,7 @@ class LoginViewModel @Inject constructor(
         val isPasswordValid = validatePassword(password.value)
 
         if (!isEmailValid || !isPasswordValid) {
-            _loginState.value =
-                LoginState.Error(resources.getString(R.string.validation_error_form_generic))
+            _loginState.value = LoginState.Error(resources.getString(R.string.validation_error_form_generic))
             return
         }
 
@@ -112,8 +111,7 @@ class LoginViewModel @Inject constructor(
                 val loginSuccess = authRepository.login(email.value, password.value)
 
                 if (loginSuccess) {
-                    _loginState.value =
-                        LoginState.Success(resources.getString(R.string.state_success_login))
+                    _loginState.value = LoginState.Success(resources.getString(R.string.state_success_login))
                     _navigationEvents.send(
                         NavigationEvent.NavigateTo(
                             route = "main_app_graph",
@@ -122,8 +120,7 @@ class LoginViewModel @Inject constructor(
                         )
                     )
                 } else {
-                    _loginState.value =
-                        LoginState.Error(resources.getString(R.string.state_error_invalid_credentials))
+                    _loginState.value = LoginState.Error(resources.getString(R.string.state_error_invalid_credentials))
                 }
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(

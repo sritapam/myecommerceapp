@@ -7,7 +7,7 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
     id ("org.jetbrains.kotlin.jvm") version "1.9.23" apply false
     alias(libs.plugins.android.library) apply false
-
+    id("androidx.room") version "2.7.0" apply false
 }
 buildscript {
     dependencies {
