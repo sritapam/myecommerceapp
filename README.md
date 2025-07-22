@@ -186,33 +186,28 @@ Code quality and test coverage are fundamental pillars of this project.
 # Run tests for a specific module (e.g., :feature:cart)
 ./gradlew :feature:cart:test
 
-# Generate HTML coverage report for all modules
-./gradlew koverHtmlReportDebug
-
-# Open the general HTML coverage report (after running the above command)
-open app/build/reports/kover/debug/html/index.html
 ```
 
 ## 📚 Additional Documentation
 
 For a deeper dive into implementation details and design decisions:
 
-- 🧩 **Multi-Module Architecture** – A comprehensive guide to the project's modular structure
-- 📖 **Technologies Used** – Justifications and roles of each tool in the tech stack
-- 🔗 **Hilt Configuration** – Details on how Dependency Injection is managed
-- 🎨 **Design & Themes** – Information on the design system and visual customization
-- 🧪 **Testing Guide** – General configuration, commands, and testing strategies
-- 📋 **ProductList Testing** – Detailed guide for testing specific ViewModels
-- 🚀 **API Configuration** – Details on API setup and integration
-- 🔐 **Authentication** – Handling of login, registration, and session
-- ☁️ **Cloudinary** – How image uploading and loading are managed
-- 📦 **WorkManager** – Implementation of background tasks
+* [**🧩 Multi-Module Architecture**](./docs/modularization.md) – A comprehensive guide to the project's modular structure.
+* [**📖 Technologies Used**](./docs/tecnologias.md) – Justifications and roles of each tool in the tech stack.
+* [**🔗 Hilt Configuration**](./docs/dependencias_hilt.md) – Details on how Dependency Injection is managed.
+* [**🎨 Design & Themes**](./docs/theme.md) – Information on the design system and visual customization.
+* [**🧪 Testing Guide**](./docs/test/testing.md) – General configuration, commands, and testing strategies.
+* [**📋 ProductList Testing**](./docs/test/productlist-testing.md) – Detailed guide for testing specific ViewModels.
+* [**🚀 API Configuration**](./docs/API.md) – Details on API setup and integration.
+* [**🔐 Authentication**](./docs/autenticacion.md) – Handling of login, registration, and session.
+* [**☁️ Cloudinary**](./docs/cloudinary.md) – How image uploading and loading are managed.
+* [**📦 WorkManager**](./docs/workmanager.md) – Implementation of background tasks.
 
----
-
+* 
 *This project demonstrates modern Android development practices with Clean Architecture, Jetpack Compose, and comprehensive testing strategies.*
-🤝 Contributions
+
+## 🤝 Contributions
 Your collaboration is welcome! If you find a bug, have a suggestion for improvement, or want to add a new feature, feel free to open an issue or submit a pull request.
 
-📄 License
+## 📄 License
 This project is licensed under the MIT License.
