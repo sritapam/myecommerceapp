@@ -34,7 +34,15 @@ class UserRepositoryImpl @Inject constructor(
         val userId = authRepository.getLoggedInUserId().firstOrNull()
 
         if (userEmail.isNullOrEmpty() || userId.isNullOrEmpty()) {
-            emit(User(id = "no_auth", fullName = "Invitado", email = "", nationality = "", imageUrl = null))
+            emit(
+                User(
+                    id = "no_auth",
+                    fullName = "Invitado",
+                    email = "",
+                    nationality = "",
+                    imageUrl = null
+                )
+            )
             return@flow
         }
 
@@ -58,17 +66,41 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: HttpException) {
             val localUserEntity = userDao.getUserById(userId)
             localUserEntity?.let { emit(it.toDomainUser()) } ?: run {
-                emit(User(id = userId, fullName = "Error de Carga", email = userEmail, nationality = "", imageUrl = null))
+                emit(
+                    User(
+                        id = userId,
+                        fullName = "Error de Carga",
+                        email = userEmail,
+                        nationality = "",
+                        imageUrl = null
+                    )
+                )
             }
         } catch (e: IOException) {
             val localUserEntity = userDao.getUserById(userId)
             localUserEntity?.let { emit(it.toDomainUser()) } ?: run {
-                emit(User(id = userId, fullName = "Sin Conexión", email = userEmail, nationality = "", imageUrl = null))
+                emit(
+                    User(
+                        id = userId,
+                        fullName = "Sin Conexión",
+                        email = userEmail,
+                        nationality = "",
+                        imageUrl = null
+                    )
+                )
             }
         } catch (e: Exception) {
             val localUserEntity = userDao.getUserById(userId)
             localUserEntity?.let { emit(it.toDomainUser()) } ?: run {
-                emit(User(id = userId, fullName = "Error Desconocido", email = userEmail, nationality = "", imageUrl = null))
+                emit(
+                    User(
+                        id = userId,
+                        fullName = "Error Desconocido",
+                        email = userEmail,
+                        nationality = "",
+                        imageUrl = null
+                    )
+                )
             }
         }
     }
@@ -135,7 +167,7 @@ class UserRepositoryImpl @Inject constructor(
             try {
                 updateUserProfile(userWithUpdatedImageAndLocalNationality).first()
             } catch (e: Exception) {
-                //TODO
+            throw RuntimeException("Error updating user profile with new image URL", e)
             }
 
         }

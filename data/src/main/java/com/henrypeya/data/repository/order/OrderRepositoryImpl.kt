@@ -1,6 +1,5 @@
 package com.henrypeya.data.repository.order
 
-import android.content.Context
 import android.net.http.HttpException
 import android.os.Build
 import androidx.annotation.RequiresExtension
@@ -17,7 +16,6 @@ import com.henrypeya.data.mappers.toDomain
 import com.henrypeya.data.mappers.toEntity
 import com.henrypeya.data.mappers.toRequestDto
 import com.henrypeya.data.workers.DataSyncWorker
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -30,7 +28,6 @@ import javax.inject.Singleton
 class OrderRepositoryImpl @Inject constructor(
     private val orderDao: OrderDao,
     private val apiService: ApiService,
-    @ApplicationContext private val context: Context,
     private val workManager: WorkManager
 ) : OrderRepository {
 
