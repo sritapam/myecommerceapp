@@ -3,20 +3,14 @@ package com.henrypeya.data.repository.order
 import androidx.work.WorkManager
 import app.cash.turbine.test
 import com.henrypeya.core.model.domain.model.order.Order
-import com.henrypeya.core.model.domain.model.order.OrderItem
-import com.henrypeya.core.model.domain.model.product.Product
-import com.henrypeya.data.local.converters.Converters
+import com.henrypeya.core.model.domain.model.user.User
+import com.henrypeya.core.model.domain.repository.user.UserRepository
 import com.henrypeya.data.local.dao.OrderDao
 import com.henrypeya.data.local.entities.OrderEntity
-import com.henrypeya.data.local.entities.OrderItemEntity
-import com.henrypeya.data.mappers.toDomain
 import com.henrypeya.data.remote.api.ApiService
-import com.henrypeya.data.remote.dto.order.OrderItemDto
 import com.henrypeya.data.remote.dto.order.OrderResponseDto
-import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,6 +21,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -38,18 +33,55 @@ class OrderRepositoryImplTest {
 
     private lateinit var orderDao: OrderDao
     private lateinit var apiService: ApiService
+    private lateinit var userRepository: UserRepository
     private lateinit var workManager: WorkManager
     private lateinit var repository: OrderRepositoryImpl
 
     private val dispatcher = StandardTestDispatcher()
 
+    private val testUser = User(
+        id = "user123",
+        fullName = "Test User",
+        email = "test@example.com",
+        nationality = "Testland",
+        imageUrl = null
+    )
+    private val testOrder = Order(
+        id = 1L,
+        userEmail = testUser.email,
+        date = Date(),
+        total = 100.0,
+        products = emptyList(),
+        isSynced = false,
+        category = "Test"
+    )
+    private val testOrderEntity = OrderEntity(
+        id = 1L,
+        userEmail = testUser.email,
+        orderIdApi = "api-123",
+        date = testOrder.date,
+        total = testOrder.total,
+        productsJson = "[]",
+        isSynced = true,
+        category = "Test"
+    )
+    private val testOrderResponseDto = OrderResponseDto(
+        id = "api-123",
+        userEmail = testUser.email,
+        orderId = "api-123",
+        items = emptyList(),
+        total = 100.0,
+        timestamp = testOrder.date.time
+    )
+
     @Before
-    fun setUp() {
+    fun setup() {
         Dispatchers.setMain(dispatcher)
         orderDao = mockk(relaxed = true)
-        apiService = mockk()
+        apiService = mockk(relaxed = true)
+        userRepository = mockk(relaxed = true)
         workManager = mockk(relaxed = true)
-        repository = OrderRepositoryImpl(orderDao, apiService, workManager)
+        repository = OrderRepositoryImpl(orderDao, apiService, userRepository, workManager)
     }
 
     @After
@@ -57,201 +89,110 @@ class OrderRepositoryImplTest {
         Dispatchers.resetMain()
     }
 
-    private fun fakeProduct(id: String = "p1") = Product(
-        id = id,
-        name = "Test",
-        description = "desc",
-        price = 10.0,
-        hasDrink = false,
-        imageUrl = null,
-        category = "Comida"
-    )
-
-    private fun fakeOrder(id: Long = 1L) = Order(
-        id = id,
-        orderIdApi = null,
-        date = Date(),
-        total = 20.0,
-        products = listOf(OrderItem(product = fakeProduct(), quantity = 2)),
-        isSynced = false,
-        category = "Comida"
-    )
-
-    private fun fakeEntity(
-        id: Long = 1L,
-        isSynced: Boolean = true
-    ): OrderEntity {
-        val productList = listOf(
-            OrderItemEntity(
-                productId = "1",
-                name = "Producto Test",
-                price = 10.0,
-                quantity = 2,
-                imageUrl = null,
-                category = "Comida"
-            )
-        )
-        val json = Converters().fromProductList(productList) ?: "[]"
-        return OrderEntity(
-            id = id,
-            orderIdApi = "api123",
-            date = Date(0),
-            total = 20.0,
-            productsJson = json,
-            isSynced = isSynced,
-            category = "Comida"
-        )
-    }
-
-    private fun Order.toEntityMock(): OrderEntity = fakeEntity(this.id, this.isSynced)
-
     @Test
-    fun `saveOrder - when API succeeds, saves synced order`() = runTest(dispatcher) {
-        val order = fakeOrder()
-        val response = OrderResponseDto(
-            id = "abc123",
-            orderId = "abc123",
-            timestamp = 20250724L,
-            total = 20.0,
-            items = listOf()
-        )
-
-        coEvery { apiService.createOrder(any()) } returns response
-        coEvery { orderDao.getOrderById(order.id) } returns null
-        coEvery { orderDao.insertOrder(any()) } returns 1L
-
-        repository.saveOrder(order)
-
-        coVerify {
-            orderDao.insertOrder(match {
-                it.orderIdApi == "abc123" && it.isSynced
-            })
-        }
-    }
-
-    @Test
-    fun `saveOrder - when API fails, saves unsynced order`() = runTest(dispatcher) {
-        val order = fakeOrder()
-        coEvery { apiService.createOrder(any()) } throws IOException()
-        coEvery { orderDao.insertOrder(any()) } returns 1L
-
-        repository.saveOrder(order)
-
-        coVerify {
-            orderDao.insertOrder(match { !it.isSynced })
-        }
-    }
-
-    @Test
-    fun `getAllOrders - on API success, emits remote orders and saves to DB`() =
+    fun `getAllOrders - cuando la API tiene éxito, emite órdenes remotas y actualiza la BD`() =
         runTest(dispatcher) {
-            val remoteOrder = fakeOrder().copy(orderIdApi = "fromApi", isSynced = true)
-            val remoteDto = remoteOrder.toEntityMock()
-            val responseDto = OrderResponseDto(
-                id = "fromApi",
-                orderId = "fromApi",
-                timestamp = remoteOrder.date.time,
-                total = remoteOrder.total,
-                items = listOf(
-                    OrderItemDto(
-                        name = "Test",
-                        description = "desc",
-                        price = 10.0,
-                        hasDrink = false,
-                        quantity = 2,
-                        imageUrl = null,
-                        category = "Comida"
-                    )
-                )
+            coEvery { userRepository.getUserProfile() } returns flowOf(testUser)
+            coEvery { apiService.getOrdersForUser(testUser.email) } returns listOf(
+                testOrderResponseDto
             )
-
-            coEvery { apiService.getAllOrders() } returns listOf(responseDto)
-            coEvery { orderDao.clearAllOrders() } just Runs
-            coEvery { orderDao.insertOrder(any()) } returns 1L
 
             repository.getAllOrders().test {
                 val result = awaitItem()
                 assertEquals(1, result.size)
-                assertEquals("fromApi", result[0].orderIdApi)
-                cancelAndIgnoreRemainingEvents()
+                assertEquals("api-123", result[0].orderIdApi)
+                awaitComplete()
+            }
+
+            coVerify { orderDao.clearOrdersForUser(testUser.email) }
+            coVerify { orderDao.insertOrder(any()) }
+        }
+
+    @Test
+    fun `getAllOrders - cuando la API falla, emite las órdenes locales del usuario`() =
+        runTest(dispatcher) {
+
+            coEvery { userRepository.getUserProfile() } returns flowOf(testUser)
+            coEvery { apiService.getOrdersForUser(testUser.email) } throws IOException("Sin conexión")
+            coEvery { orderDao.getOrdersForUser(testUser.email) } returns flowOf(
+                listOf(
+                    testOrderEntity
+                )
+            )
+
+            repository.getAllOrders().test {
+                val result = awaitItem()
+                assertEquals(1, result.size)
+                assertEquals(testUser.email, result[0].userEmail)
+                awaitComplete()
             }
         }
 
     @Test
-    fun `getAllOrders - on API failure, emits local orders`() = runTest(dispatcher) {
-        val fakeEntity = fakeEntity()
-        val expectedDomainOrder = fakeEntity.toDomain()
+    fun `getAllOrders - cuando no hay usuario logueado, emite una lista vacía`() =
+        runTest(dispatcher) {
 
-        coEvery { apiService.getAllOrders() } throws IOException()
-        coEvery { orderDao.getAllOrders() } returns flowOf(listOf(fakeEntity))
-
-        repository.getAllOrders().test {
-            val result = awaitItem()
-            assertEquals(1, result.size)
-            assertEquals(expectedDomainOrder.total, result[0].total, 0.01)
-            assertEquals(expectedDomainOrder.category, result[0].category)
-            assertEquals(
-                expectedDomainOrder.products.first().product.name,
-                result[0].products.first().product.name
+            coEvery { userRepository.getUserProfile() } returns flowOf(
+                User(
+                    id = "no_auth",
+                    email = "",
+                    fullName = "Invitado",
+                    nationality = ""
+                )
             )
-            cancelAndIgnoreRemainingEvents()
+
+            repository.getAllOrders().test {
+                val result = awaitItem()
+                assertTrue(result.isEmpty())
+                awaitComplete()
+            }
+
+            coVerify(exactly = 0) { apiService.getOrdersForUser(any()) }
+            coVerify(exactly = 0) { orderDao.getOrdersForUser(any()) }
         }
-    }
 
     @Test
-    fun `getUnSyncedOrders returns mapped domain orders`() = runTest(dispatcher) {
-        val entity = fakeEntity()
-        coEvery { orderDao.getUnSyncedOrders() } returns listOf(entity)
+    fun `saveOrder - cuando la API falla, guarda la orden como no sincronizada`() =
+        runTest(dispatcher) {
 
-        val result = repository.getUnSyncedOrders()
+            coEvery { apiService.createOrder(any()) } throws IOException("API falló")
 
-        assertEquals(1, result.size)
-        assertEquals(entity.total, result[0].total, 0.01)
-    }
+            repository.saveOrder(testOrder)
+
+            coVerify {
+                orderDao.insertOrder(match {
+                    !it.isSynced && it.userEmail == testUser.email
+                })
+            }
+        }
 
     @Test
-    fun `syncOrder - if order exists, updates as synced`() = runTest(dispatcher) {
-        val order = fakeOrder()
-        val response = OrderResponseDto(
-            id = "abc123",
-            orderId = "abc123",
-            timestamp = 20250724L,
-            total = 20.0,
-            items = listOf()
-        )
+    fun `getUnSyncedOrders - devuelve solo las órdenes no sincronizadas del usuario actual`() =
+        runTest(dispatcher) {
 
-        coEvery { apiService.createOrder(any()) } returns response
-        coEvery { orderDao.getOrderById(order.id) } returns fakeEntity()
-        coEvery { orderDao.updateOrder(any()) } just Runs
+            coEvery { userRepository.getUserProfile() } returns flowOf(testUser)
+            coEvery { orderDao.getUnSyncedOrdersForUser(testUser.email) } returns listOf(
+                testOrderEntity.copy(isSynced = false)
+            )
 
-        val result = repository.syncOrder(order)
+            val result = repository.getUnSyncedOrders()
+
+            assertEquals(1, result.size)
+            assertFalse(result[0].isSynced)
+            assertEquals(testUser.email, result[0].userEmail)
+        }
+
+    @Test
+    fun `syncOrder - si la orden no existe, la inserta como sincronizada`() = runTest(dispatcher) {
+
+        coEvery { apiService.createOrder(any()) } returns testOrderResponseDto
+        coEvery { orderDao.getOrderById(testOrder.id) } returns null // La orden no existe localmente
+
+        val result = repository.syncOrder(testOrder)
 
         assertTrue(result)
         coVerify {
-            orderDao.updateOrder(match { it.isSynced && it.orderIdApi == "abc123" })
-        }
-    }
-
-    @Test
-    fun `syncOrder - if order doesn't exist, inserts as synced`() = runTest(dispatcher) {
-        val order = fakeOrder()
-        val response = OrderResponseDto(
-            id = "abc123",
-            orderId = "abc123",
-            timestamp = 20250724L,
-            total = 20.0,
-            items = listOf()
-        )
-
-        coEvery { apiService.createOrder(any()) } returns response
-        coEvery { orderDao.getOrderById(order.id) } returns null
-        coEvery { orderDao.insertOrder(any()) } returns 1L
-
-        val result = repository.syncOrder(order)
-
-        assertTrue(result)
-        coVerify {
-            orderDao.insertOrder(match { it.isSynced && it.orderIdApi == "abc123" })
+            orderDao.updateOrder(match { it.isSynced && it.orderIdApi == "api-123" })
         }
     }
 }

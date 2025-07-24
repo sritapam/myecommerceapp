@@ -1,6 +1,5 @@
 package com.henrypeya.data.repository.order
 
-import android.net.http.HttpException
 import android.os.Build
 import androidx.annotation.RequiresExtension
 import androidx.work.BackoffPolicy
@@ -10,6 +9,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.henrypeya.core.model.domain.model.order.Order
 import com.henrypeya.core.model.domain.repository.order.OrderRepository
+import com.henrypeya.core.model.domain.repository.user.UserRepository
 import com.henrypeya.data.local.dao.OrderDao
 import com.henrypeya.data.remote.api.ApiService
 import com.henrypeya.data.mappers.toDomain
@@ -17,9 +17,8 @@ import com.henrypeya.data.mappers.toEntity
 import com.henrypeya.data.mappers.toRequestDto
 import com.henrypeya.data.workers.DataSyncWorker
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,6 +27,7 @@ import javax.inject.Singleton
 class OrderRepositoryImpl @Inject constructor(
     private val orderDao: OrderDao,
     private val apiService: ApiService,
+    private val userRepository: UserRepository,
     private val workManager: WorkManager
 ) : OrderRepository {
 
@@ -36,25 +36,18 @@ class OrderRepositoryImpl @Inject constructor(
         try {
             val orderRequestDto = order.toRequestDto()
             val createdOrderResponseDto = apiService.createOrder(orderRequestDto)
-            val existingOrderEntity = if (order.id != 0L) orderDao.getOrderById(order.id) else null
 
             val entityToSave = order.toEntity().copy(
                 orderIdApi = createdOrderResponseDto.id,
                 isSynced = true
             )
 
+            val existingOrderEntity = if (order.id != 0L) orderDao.getOrderById(order.id) else null
             if (existingOrderEntity != null) {
                 orderDao.updateOrder(entityToSave)
             } else {
-                val localId = orderDao.insertOrder(entityToSave)
+                orderDao.insertOrder(entityToSave)
             }
-
-        } catch (e: HttpException) {
-            val orderEntity = order.toEntity().copy(isSynced = false)
-            orderDao.insertOrder(orderEntity)
-        } catch (e: IOException) {
-            val orderEntity = order.toEntity().copy(isSynced = false)
-            orderDao.insertOrder(orderEntity)
         } catch (e: Exception) {
             val orderEntity = order.toEntity().copy(isSynced = false)
             orderDao.insertOrder(orderEntity)
@@ -63,30 +56,35 @@ class OrderRepositoryImpl @Inject constructor(
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun getAllOrders(): Flow<List<Order>> = flow {
+        val userEmail = userRepository.getUserProfile().firstOrNull()?.email
+
+        if (userEmail.isNullOrEmpty()) {
+            emit(emptyList())
+            return@flow
+        }
+
         try {
-            val orderDtos = apiService.getAllOrders()
+            val orderDtos = apiService.getOrdersForUser(userEmail)
             val domainOrdersFromApi = orderDtos.map { it.toDomain() }
 
-          orderDao.clearAllOrders()
+            orderDao.clearOrdersForUser(userEmail)
+
             domainOrdersFromApi.forEach { domainOrder ->
-                orderDao.insertOrder(domainOrder.toEntity().copy(isSynced = true, orderIdApi = domainOrder.orderIdApi))
+                orderDao.insertOrder(domainOrder.toEntity().copy(isSynced = true))
             }
             emit(domainOrdersFromApi)
-
-        } catch (e: HttpException) {
-            val localOrders = orderDao.getAllOrders().first().map { it.toDomain() }
-            emit(localOrders)
-        } catch (e: IOException) {
-            val localOrders = orderDao.getAllOrders().first().map { it.toDomain() }
-            emit(localOrders)
         } catch (e: Exception) {
-            val localOrders = orderDao.getAllOrders().first().map { it.toDomain() }
+            val localOrders = orderDao.getOrdersForUser(userEmail).firstOrNull()?.map { it.toDomain() } ?: emptyList()
             emit(localOrders)
         }
     }
 
     override suspend fun getUnSyncedOrders(): List<Order> {
-        return orderDao.getUnSyncedOrders().map { it.toDomain() }
+        val userEmail = userRepository.getUserProfile().firstOrNull()?.email
+        if (userEmail.isNullOrEmpty()) {
+            return emptyList()
+        }
+        return orderDao.getUnSyncedOrdersForUser(userEmail).map { it.toDomain() }
     }
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -95,29 +93,12 @@ class OrderRepositoryImpl @Inject constructor(
             val orderRequestDto = order.toRequestDto()
             val createdOrderResponseDto = apiService.createOrder(orderRequestDto)
 
-            val existingOrderEntity = orderDao.getOrderById(order.id)
-
-            if (existingOrderEntity != null) {
-                val updatedOrderEntity = existingOrderEntity.copy(
-                    orderIdApi = createdOrderResponseDto.id,
-                    isSynced = true
-                )
-                orderDao.updateOrder(updatedOrderEntity)
-                true
-            } else {
-                val newSyncedEntity = order.toEntity().copy(
-                    orderIdApi = createdOrderResponseDto.id,
-                    isSynced = true
-                )
-                orderDao.insertOrder(newSyncedEntity)
-                true
-            }
-        } catch (e: HttpException) {
-            enqueueOneTimeSyncWorker()
-            false
-        } catch (e: IOException) {
-            enqueueOneTimeSyncWorker()
-            false
+            val updatedOrderEntity = order.toEntity().copy(
+                orderIdApi = createdOrderResponseDto.id,
+                isSynced = true
+            )
+            orderDao.updateOrder(updatedOrderEntity)
+            true
         } catch (e: Exception) {
             enqueueOneTimeSyncWorker()
             false

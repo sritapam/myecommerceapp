@@ -14,6 +14,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -39,5 +40,5 @@ interface ApiService {
     suspend fun createOrder(@Body request: OrderRequestDto): OrderResponseDto
 
     @GET("orders")
-    suspend fun getAllOrders(): List<OrderResponseDto>
+    suspend fun getOrdersForUser(@Query("userEmail") email: String): List<OrderResponseDto>
 }

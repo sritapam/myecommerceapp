@@ -13,10 +13,10 @@
     <string name="label_item_total">Total ítem: %1$s</string>
 
     <string name="error_unknown">Desconocido</string>
-    <string name="error_updating_quantity">Error al actualizar cantidad: %1$s</string>
-    <string name="error_removing_item">Error al eliminar producto: %1$s</string>
-    <string name="error_clearing_cart">Error al vaciar carrito: %1$s</string>
-    <string name="error_checkout">Error al procesar la compra: %1$s</string>
+    <string name="error_updating_quantity">Error al actualizar cantidad</string>
+    <string name="error_removing_item">Error al eliminar producto</string>
+    <string name="error_clearing_cart">Error al vaciar carrito</string>
+    <string name="error_checkout">Error al procesar la compra</string>
     <string name="checkout_success_message">Compra realizada exitosamente. ¡Gracias!</string>
 
     <string name="content_desc_cart_icon">Carrito de Compras</string>
@@ -34,5 +34,6 @@
     <string name="action_confirm_payment">Confirmar Pago</string>
     <string name="checkout_success_title">¡Gracias por tu compra!</string>
     <string name="checkout_success_subtitle">Tu pedido se está preparando...</string>
+    <string name="login_error_email">Por favor, vuelve a loguearte</string>
 
 </resources>

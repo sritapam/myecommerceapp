@@ -25,6 +25,7 @@ fun DomainOrder.toEntity(): OrderEntity {
     }
     return OrderEntity(
         id = this.id,
+        userEmail = this.userEmail,
         orderIdApi = this.orderIdApi,
         date = this.date,
         total = this.total,
@@ -52,6 +53,7 @@ fun OrderEntity.toDomain(): DomainOrder {
     }
     return DomainOrder(
         id = this.id,
+        userEmail = this.userEmail,
         orderIdApi = this.orderIdApi,
         date = this.date,
         total = this.total,
@@ -82,6 +84,7 @@ fun DomainOrder.toRequestDto(): OrderRequestDto {
 
     return OrderRequestDto(
         orderId = generatedOrderId,
+        userEmail = this.userEmail,
         items = orderItemDtos,
         total = this.total,
         timestamp = this.date.time
@@ -106,6 +109,7 @@ fun OrderResponseDto.toDomain(): DomainOrder {
     return DomainOrder(
         id = 0,
         orderIdApi = this.id,
+        userEmail = this.userEmail,
         date = Date(this.timestamp),
         total = this.total,
         products = domainOrderItems,

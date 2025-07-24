@@ -13,18 +13,18 @@ interface OrderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrder(order: OrderEntity): Long
 
-    @Query("SELECT * FROM orders ORDER BY date DESC")
-    fun getAllOrders(): Flow<List<OrderEntity>>
+    @Query("SELECT * FROM orders WHERE userEmail = :email ORDER BY date DESC")
+    fun getOrdersForUser(email: String): Flow<List<OrderEntity>>
 
     @Update
     suspend fun updateOrder(order: OrderEntity)
 
-    @Query("SELECT * FROM orders WHERE isSynced = 0")
-    suspend fun getUnSyncedOrders(): List<OrderEntity>
+    @Query("SELECT * FROM orders WHERE isSynced = 0 AND userEmail = :email")
+    suspend fun getUnSyncedOrdersForUser(email: String): List<OrderEntity>
 
     @Query("SELECT * FROM orders WHERE id = :localId")
     suspend fun getOrderById(localId: Long): OrderEntity?
 
-    @Query("DELETE FROM orders")
-    suspend fun clearAllOrders()
+    @Query("DELETE FROM orders WHERE userEmail = :email")
+    suspend fun clearOrdersForUser(email: String)
 }

@@ -4,6 +4,7 @@ import java.util.Date
 
 data class Order(
     val id: Long = 0,
+    val userEmail: String,
     val orderIdApi: String? = null,
     val date: Date,
     val total: Double,

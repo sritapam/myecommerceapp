@@ -15,12 +15,14 @@ import com.henrypeya.data.mappers.toDomainUser
 import com.henrypeya.data.mappers.toEntityUser
 import com.henrypeya.data.mappers.toUpdateProfileRequestDto
 import com.henrypeya.data.remote.api.ApiService
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 
 @Singleton
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val cloudinaryService: CloudinaryService,
@@ -28,7 +30,6 @@ class UserRepositoryImpl @Inject constructor(
     private val authRepository: AuthRepository
 ) : UserRepository {
 
-    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override suspend fun getUserProfile(): Flow<User> = flow {
         val userEmail = authRepository.getLoggedInUserEmail().firstOrNull()
         val userId = authRepository.getLoggedInUserId().firstOrNull()
@@ -46,62 +47,56 @@ class UserRepositoryImpl @Inject constructor(
             return@flow
         }
 
-        try {
-            val userDtoFromApi = apiService.getUserByEmail(userEmail)
-            val domainUserFromApi = userDtoFromApi.toDomainUser()
+        val userDtoFromApi = apiService.getUserByEmail(userEmail)
+        val domainUserFromApi = userDtoFromApi.toDomainUser()
 
-            val existingLocalUser = userDao.getUserById(userId)
-            val localNationality = existingLocalUser?.nationality ?: ""
-            val localImageUrl = existingLocalUser?.imageUrl
-            val finalDomainUser = domainUserFromApi.copy(
-                nationality = localNationality,
-                imageUrl = domainUserFromApi.imageUrl ?: localImageUrl
-            )
+        val existingLocalUser = userDao.getUserById(userId)
+        val localNationality = existingLocalUser?.nationality ?: ""
+        val localImageUrl = existingLocalUser?.imageUrl
+        val finalDomainUser = domainUserFromApi.copy(
+            nationality = localNationality,
+            imageUrl = domainUserFromApi.imageUrl ?: localImageUrl
+        )
 
-            userDao.deleteAllUsers()
-            userDao.insertUser(finalDomainUser.toEntityUser())
+        userDao.deleteAllUsers()
+        userDao.insertUser(finalDomainUser.toEntityUser())
 
-            emit(finalDomainUser)
+        emit(finalDomainUser)
 
-        } catch (e: HttpException) {
-            val localUserEntity = userDao.getUserById(userId)
-            localUserEntity?.let { emit(it.toDomainUser()) } ?: run {
-                emit(
-                    User(
-                        id = userId,
-                        fullName = "Error de Carga",
-                        email = userEmail,
-                        nationality = "",
-                        imageUrl = null
-                    )
+    }.catch { e ->
+        val userId = authRepository.getLoggedInUserId().firstOrNull()
+        val userEmail = authRepository.getLoggedInUserEmail().firstOrNull() ?: ""
+        val localUserEntity = userId?.let { userDao.getUserById(it) }
+
+        if (localUserEntity != null) {
+            emit(localUserEntity.toDomainUser())
+        } else {
+            val errorUser = when (e) {
+                is HttpException -> User(
+                    id = userId ?: "error",
+                    fullName = "Error de Carga",
+                    email = userEmail,
+                    nationality = "",
+                    imageUrl = null
+                )
+
+                is IOException -> User(
+                    id = userId ?: "error",
+                    fullName = "Sin Conexión",
+                    email = userEmail,
+                    nationality = "",
+                    imageUrl = null
+                )
+
+                else -> User(
+                    id = userId ?: "error",
+                    fullName = "Error Desconocido",
+                    email = userEmail,
+                    nationality = "",
+                    imageUrl = null
                 )
             }
-        } catch (e: IOException) {
-            val localUserEntity = userDao.getUserById(userId)
-            localUserEntity?.let { emit(it.toDomainUser()) } ?: run {
-                emit(
-                    User(
-                        id = userId,
-                        fullName = "Sin Conexión",
-                        email = userEmail,
-                        nationality = "",
-                        imageUrl = null
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            val localUserEntity = userDao.getUserById(userId)
-            localUserEntity?.let { emit(it.toDomainUser()) } ?: run {
-                emit(
-                    User(
-                        id = userId,
-                        fullName = "Error Desconocido",
-                        email = userEmail,
-                        nationality = "",
-                        imageUrl = null
-                    )
-                )
-            }
+            emit(errorUser)
         }
     }
 
@@ -167,7 +162,7 @@ class UserRepositoryImpl @Inject constructor(
             try {
                 updateUserProfile(userWithUpdatedImageAndLocalNationality).first()
             } catch (e: Exception) {
-            throw RuntimeException("Error updating user profile with new image URL", e)
+                throw RuntimeException("Error updating user profile with new image URL", e)
             }
 
         }
