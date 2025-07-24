@@ -1,6 +1,10 @@
 package com.henrypeya.data.remote.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.work.WorkManager
 import com.henrypeya.data.BuildConfig
 import com.henrypeya.data.remote.api.ApiService
@@ -33,7 +37,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideCache(@ApplicationContext context: Context): Cache {
-        val cacheSize = 10 * 1024 * 1024L // 10 MB
+        val cacheSize = 10 * 1024 * 1024L
         val httpCacheDirectory = File(context.cacheDir, "http-cache")
         return Cache(httpCacheDirectory, cacheSize)
     }
@@ -80,5 +84,15 @@ object NetworkModule {
     @Singleton
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            produceFile = {
+                context.preferencesDataStoreFile("auth_preferences")
+            }
+        )
     }
 }
