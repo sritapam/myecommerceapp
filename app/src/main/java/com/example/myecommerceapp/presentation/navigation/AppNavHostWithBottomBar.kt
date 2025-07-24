@@ -61,13 +61,11 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    // Lógica para mostrar la barra de navegación inferior
     val showBottomBar = currentDestination?.hierarchy?.any { destination ->
         destination.route?.startsWith(Destinations.MAIN_APP_GRAPH) == true ||
                 destination.route == Destinations.ORDER_HISTORY_ROUTE
     } == true
 
-    // Efecto para manejar la sesión del usuario
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn && currentDestination?.route != Destinations.LOGIN_ROUTE && currentDestination?.route != Destinations.REGISTER_ROUTE) {
             navController.navigate(Destinations.LOGIN_ROUTE) {
@@ -109,7 +107,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
             startDestination = Destinations.DECIDER_ROUTE,
             modifier = Modifier.padding(paddingValues)
         ) {
-            // Ruta inicial que decide si ir al login o a la app principal
             composable(Destinations.DECIDER_ROUTE) {
                 val authViewModel: AuthViewModel = hiltViewModel()
                 LaunchedEffect(Unit) {
@@ -126,7 +123,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                 }
             }
 
-            // Rutas de autenticación
             composable(Destinations.LOGIN_ROUTE) {
                 LoginScreen(navController = navController)
             }
@@ -134,7 +130,6 @@ fun AppNavHostWithBottomBar(navController: NavHostController) {
                 RegisterScreen(navController = navController)
             }
 
-            // Grafo de navegación principal (con BottomBar)
             navigation(
                 startDestination = Destinations.PRODUCTS_ROUTE,
                 route = Destinations.MAIN_APP_GRAPH
